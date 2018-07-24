@@ -7,8 +7,8 @@ N = 10
 K = 1
 class ROBOT:
     'data structure of robot'
-
-    def __init__(self, number, location, routing_strategy, role='node'):
+    role_set = set(['node', 'redundant_node', 'junction', 'leaf', 'leader'])
+    def __init__(self, number, location, routing_strategy, role='redundant_node'):
         self.number = number
         self.location = location
         self.routing_strategy = routing_strategy
@@ -17,7 +17,11 @@ class ROBOT:
     def location_update(self, new_location):
         self.location = new_location
     def role_update(self, new_role):
-        self.role = new_role
+        if(new_role in self.role_set):
+            self.role = new_role
+        else:
+            print("Error!")
+
 
 
 
@@ -28,7 +32,7 @@ def location_extraction(robot_list):
         location = np.vstack((location, robot_list[i].location))
     return location
 
-def leader_election(robot_list, target):
+def leader_election(robot_list, target): # waiting to be modefied into distributed fashion
     'input: a list of robot; output: leader of these robots via consensus'
     location = location_extraction(robot_list)
     distance = [LA.norm(x-target) for x in location]
