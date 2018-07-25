@@ -69,9 +69,9 @@ def optimal_routing(x):
     time_end = time.time()
     # print('time cost %f s' % (time_end-time_start))
     if(sol['status']=='optimal'):
-        from routing_present import routing_graph
-        transmission = T * R
-        routing_graph(x, transmission, N, K)
+        # from routing_present import routing_graph
+        # transmission = T * R
+        # routing_graph(x, transmission, N, K)
         return sol, T
     else:
         return sol, False

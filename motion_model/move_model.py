@@ -19,28 +19,33 @@ def active_team_move(robot_list, moving_robot_index, target):
     'the last one is leader'
     sigma = 1
     location = location_extraction(robot_list)
-    new_location = location
+    new_location = location.copy()
     team_length = len(moving_robot_index)
     routing_strategy = routing_strategy_extraction(robot_list)
-
+    print('moving robot index:')
+    print(moving_robot_index)
     while(1):
         for i in range(team_length):
             if(i<team_length-1):
-                new_location[moving_robot_index[i]] = single_node_move(location, moving_robot_index[i],
-                                     robot_list[moving_robot_index[i+1]].location, routing_strategy, sigma)
+                new_location[moving_robot_index[i]] = \
+                    single_node_move(location, moving_robot_index[i],
+                                     location[moving_robot_index[i+1]], routing_strategy, sigma)
             else:
                 new_location[moving_robot_index[i]] = single_node_move(location, moving_robot_index[i],
                                      target, routing_strategy, sigma)
+
         if(max(LA.norm((new_location-location), axis=1))<=0.001):
+            print(LA.norm((new_location-location), axis=1))
+            print('BREAK')
             break
         else:
+            print('I am called!')
             unuse, routing_strategy = optimal_routing(new_location)
             location = new_location
-            for i, x in enumerate(robot_list):
-                if (i < N):
-                    x.location_update(location[i])
-                    x.routing_strategy_update(routing_strategy[i])
         routing_graph(location, transmission(location, routing_strategy), N, K)
 
-
+    for i, x in enumerate(robot_list):
+        if (i < N):
+            x.location_update(location[i])
+            x.routing_strategy_update(routing_strategy[i])
     return robot_list

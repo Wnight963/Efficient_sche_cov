@@ -99,23 +99,29 @@ def leader_move(robot_list,leader_index, target):
     return robot_list
 
 
-def single_node_move(location, single_moving_node_index, destination, routing_strategy, sigma):
+def single_node_move(location_of_robot, single_moving_node_index, destination, routing_strategy, sigma):
 
     'leader moves towards the target, until communication constraints are breaked'
     'to determine the farest position leader can reach, we use a binary search'
     'return new location of that moving node'
+
+
+
+    location = location_of_robot.copy()
+    # this is important! to copy a list in python, The operator [:] returns a slice of a sequence.
+    # Slicing a portion of a list: create a new list. In this way, changing location will not changes
+    # location_of_robot as the same time.
 
     print('before moving:')
     print(location[single_moving_node_index])
     print('target:')
     print(destination)
 
-
     a, b = location[single_moving_node_index], destination
     b = (sigma/(LA.norm(b-a)))*(b-a) + a
     while(1):
         new_location = (a+b)/2
-        if(LA.norm(new_location-a)<=0.02):
+        if(LA.norm(new_location-a)<=0.0002):
             print('after moving:')
             print(a)
             return a
