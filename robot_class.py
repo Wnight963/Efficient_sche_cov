@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(r'communication_model')
 
-N = 10
+N = 11
 K = 1
 
 class ROBOT:

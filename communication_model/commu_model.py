@@ -11,7 +11,7 @@ def optimal_routing(x, leader_index):
 
 
     ####################################### prepare some parameters
-    N = 10
+    N = 11
     K = 1
     source_data = 0.2
     #this parameter needs to be small, otherwise it's hard to find optimal solution
