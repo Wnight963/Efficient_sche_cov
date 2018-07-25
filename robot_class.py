@@ -19,6 +19,7 @@ class ROBOT:
         self.routing_strategy = routing_strategy
         self.role = role
     # routing_strategy: np.array(), shape 1*(N+K)
+    # location: np.ndarray, raw represents robot, two colomns.
 
     def location_update(self, new_location):
         self.location = new_location
@@ -29,13 +30,14 @@ class ROBOT:
             print("Error!")
     def routing_strategy_update(self, new_routing_strategy):
         self.routing_strategy = new_routing_strategy
-    # def routing_strategy_update(self, new_routing_strategy):
+
 
 
 
 
 
 def location_extraction(robot_list):
+    'input: a list of robots, output: location of robots, np.ndarray, shape (robot number, 2)'
     M = len(robot_list)
     location = robot_list[0].location
     for i in range(1, M):
@@ -43,7 +45,7 @@ def location_extraction(robot_list):
     return location
 
 def routing_strategy_extraction(robot_list):
-    'return routing strategy of robots from 0 to N-1, the last K are APs and are overlooked'
+    'output: routing strategy of robots from 0 to N-1, the last K are APs and are overlooked'
     M = len(robot_list)
     routing_strategy = robot_list[0].routing_strategy
     for i in range(1, M):
@@ -51,6 +53,7 @@ def routing_strategy_extraction(robot_list):
     return routing_strategy[0:N]
 
 def leader_index_extraction(robot_list):
+    'return number of robot whose role is "leader"'
     for x in robot_list:
         if(x.role=='leader'):
             return x.number
@@ -66,6 +69,9 @@ def leader_election(robot_list, target): # waiting to be modefied into distribut
     return robot_list, leader_index
 
 def recruit_election(robot_list):
+
+    'input: a list of robot; output: recruit of these robots via consensus'
+
     routing_strategy = routing_strategy_extraction(robot_list)
     leader_index = leader_index_extraction(robot_list)
     T = list(routing_strategy[leader_index,:])[0:N+K-1]
@@ -101,7 +107,7 @@ def leader_move(robot_list,leader_index, target):
 
 def single_node_move(location_of_robot, single_moving_node_index, destination, routing_strategy, sigma):
 
-    'leader moves towards the target, until communication constraints are breaked'
+    'robot moves towards the destination, with given communication constraints obeyed'
     'to determine the farest position leader can reach, we use a binary search'
     'return new location of that moving node'
 
@@ -112,22 +118,23 @@ def single_node_move(location_of_robot, single_moving_node_index, destination, r
     # Slicing a portion of a list: create a new list. In this way, changing location will not changes
     # location_of_robot as the same time.
 
-    print('before moving:')
-    print(location[single_moving_node_index])
-    print('target:')
-    print(destination)
+    # print('before moving:')
+    # print(location[single_moving_node_index])
+    # print('target:')
+    # print(destination)
 
     a, b = location[single_moving_node_index], destination
     b = (sigma/(LA.norm(b-a)))*(b-a) + a
     while(1):
         new_location = (a+b)/2
         if(LA.norm(new_location-a)<=0.0002):
-            print('after moving:')
-            print(a)
+            # print('after moving:')
+            # print(a)
             return a
         else:
             location[single_moving_node_index] = new_location
             res = ci(location, single_moving_node_index, routing_strategy)
+            # check if the packet routing condition is obeyed
             if(res>=0):
                 a = new_location
             else:

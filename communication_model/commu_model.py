@@ -7,7 +7,7 @@ from channel_capa import Capacity
 
 N = 11
 K = 1
-source_data = 0.2
+source_data = 0.02
 
 def optimal_routing(x):
     # input: x: locations of robots; lead_index
@@ -63,6 +63,7 @@ def optimal_routing(x):
     h = matrix(h)
 
     solvers.options['show_progress'] = False
+    solvers.options['maxiters'] = 100
     sol=solvers.qp(Q, p, G, h)
     T = np.array(sol['x'])
     T = T.reshape([N, N+K], order="F")
@@ -77,21 +78,29 @@ def optimal_routing(x):
         return sol, False
 
 
-def transmission(x, routing):
-    'return transmission data between robots, it is routing time * channel capacity'
+def transmission(x, T):
+    
+    'return transmission data between robots, it is T time * channel capacity'
+
     R = np.zeros([N, N + K])
+    # R is channel capacity matrix
     for i in range(N):
         for j in range(N + K):
             R[i, j] = Capacity(x[i], x[j])
-    tmp = routing * R
+    tmp = T * R
     return tmp
 
 def ci(x, index, T):
+
     'test if robot i can send out more data than receive'
+    'i.e., if the packet routing condition is obeyed'
+    'x: robot locations; index: examined robot; T:routing strategy '
+
     R = np.zeros([N, N + K])
     for i in range(N):
         for j in range(N + K):
             R[i, j] = Capacity(x[i], x[j])
     tmp = T * R
+    # transmission data amount
     ci = sum(tmp[index, :]) - sum(tmp[:, index]) - source_data
     return ci

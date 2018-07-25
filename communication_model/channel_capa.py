@@ -5,6 +5,10 @@ u = 0.4
 l = 2
 
 def Capacity(x,y):
+
+    'input: two locations'
+    'output: channel capacity between them'
+
     distance = LA.norm(x - y)
     if distance>l:
         return 0

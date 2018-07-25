@@ -30,6 +30,9 @@ robots = leader_move(robots, leader_index, target)
 robots, recruit_index = recruit_election(robots)
 moving_robot_index = [recruit_index, leader_index]
 robots = active_team_move(robots, moving_robot_index, target)
+
+
+
 # while(LA.norm(robots[leader_index].location-target)>=0.01):
 #     robots = active_team_move(robots)
 #     robots, recruit_index = recruit_election(robots)
