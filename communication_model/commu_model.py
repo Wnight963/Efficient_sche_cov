@@ -45,8 +45,6 @@ def optimal_routing(x):
     G3 = -np.eye(N*(N+K))
     G = np.vstack((G1, G2, G3))
 
-    # h1 = -np.zeros([N, 1])
-    # h1[leader_index] = -source_data
     h1 = -source_data * np.ones([N, 1])
     h2 = np.ones([N, 1])
     h3 = np.zeros([N*(N+K), 1])
@@ -79,8 +77,17 @@ def optimal_routing(x):
         return sol, False
 
 
+def transmission(x, routing):
+    'return transmission data between robots, it is routing time * channel capacity'
+    R = np.zeros([N, N + K])
+    for i in range(N):
+        for j in range(N + K):
+            R[i, j] = Capacity(x[i], x[j])
+    tmp = routing * R
+    return tmp
 
 def ci(x, index, T):
+    'test if robot i can send out more data than receive'
     R = np.zeros([N, N + K])
     for i in range(N):
         for j in range(N + K):

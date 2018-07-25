@@ -5,6 +5,7 @@ from robot_class import recruit_election
 import sys
 
 sys.path.append(r'motion_model')
+sys.path.append(r'communication_model')
 from move_model import active_team_move
 
 import numpy.linalg as LA
@@ -41,15 +42,6 @@ robots = active_team_move(robots, moving_robot_index, target)
 #                   routing_strategy_extraction(robots), sigma=0.1)
 
 
-from robot_class import location_extraction
-x = location_extraction(robots)
-import matplotlib.pyplot as plt
-plt.figure("final position")
-plt.scatter(x[:,0],x[:,1])
-plt.scatter(target[0], target[1])
-n = range(N+K)
-for i,txt in enumerate(n):
-    plt.annotate(txt, (x[i,0],x[i,1]))
-plt.show()
+
 
 ###############################################

@@ -4,6 +4,8 @@ import sys
 
 sys.path.append(r'communication_model')
 
+from commu_model import ci
+
 N = 11
 K = 1
 
@@ -41,6 +43,7 @@ def location_extraction(robot_list):
     return location
 
 def routing_strategy_extraction(robot_list):
+    'return routing strategy of robots from 0 to N-1, the last K are APs and are overlooked'
     M = len(robot_list)
     routing_strategy = robot_list[0].routing_strategy
     for i in range(1, M):
@@ -96,23 +99,25 @@ def leader_move(robot_list,leader_index, target):
     return robot_list
 
 
-def single_node_move(robot_list, single_moving_node_index, destination, routing_strategy, sigma):
+def single_node_move(location, single_moving_node_index, destination, routing_strategy, sigma):
 
     'leader moves towards the target, until communication constraints are breaked'
     'to determine the farest position leader can reach, we use a binary search'
     'return new location of that moving node'
 
     print('before moving:')
-    print(robot_list[single_moving_node_index].location)
-    from commu_model import ci
-    location = location_extraction(robot_list)
-    a, b = robot_list[single_moving_node_index].location, destination
+    print(location[single_moving_node_index])
+    print('target:')
+    print(destination)
+
+
+    a, b = location[single_moving_node_index], destination
     b = (sigma/(LA.norm(b-a)))*(b-a) + a
     while(1):
         new_location = (a+b)/2
         if(LA.norm(new_location-a)<=0.02):
             print('after moving:')
-            print(robot_list[single_moving_node_index].location)
+            print(a)
             return a
         else:
             location[single_moving_node_index] = new_location
