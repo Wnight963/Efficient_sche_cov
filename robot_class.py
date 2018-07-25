@@ -3,10 +3,13 @@ import numpy.linalg as LA
 import sys
 
 sys.path.append(r'communication_model')
+
 N = 10
 K = 1
+
 class ROBOT:
     'data structure of robot'
+
     role_set = set(['node', 'redundant_node', 'junction', 'leaf', 'leader'])
     def __init__(self, number, location, routing_strategy, role='redundant_node'):
         self.number = number
@@ -32,23 +35,29 @@ def location_extraction(robot_list):
         location = np.vstack((location, robot_list[i].location))
     return location
 
+
 def leader_election(robot_list, target): # waiting to be modefied into distributed fashion
-    'input: a list of robot; output: leader of these robots via consensus'
+
+    #input: a list of robot; output: leader of these robots via consensus
+
     location = location_extraction(robot_list)
     distance = [LA.norm(x-target) for x in location]
     leader_index = distance.index(min(distance[0:N]))
     robot_list[leader_index].role_update('leader')
     return robot_list, leader_index
 
+
 def leader_move(robot_list,leader_index, target):
-    'leader moves towards the target, until communication constraints are breaked'
+
+    #leader moves towards the target, until communication constraints are breaked
     #to determine the farest position leader can reach, we use a binary search
+
     from commu_model import optimal_routing
     location = location_extraction(robot_list)
     a, b = robot_list[leader_index].location, target
     while(1):
         new_location = (a+b)/2
-        if(LA.norm(new_location-a)<=0.05):
+        if(LA.norm(new_location-a)<=0.02):
             break
         else:
             location[leader_index] = new_location

@@ -1,12 +1,13 @@
 from robot_class import ROBOT
 from robot_class import leader_election
 from robot_class import leader_move
+
 import numpy as np
 N = 10    # number of robots
 K = 1     # number of base station
 
 
-target = np.array([10, 10])
+target = np.array([1.6, 1.6])
 # location is represented by np.array
 
 initial_location = np.random.uniform(0, 0.2, size=[N+K,2])
@@ -20,12 +21,10 @@ robots = leader_move(robots, leader_index, target)
 
 ############################################### recruit election,
 
-
-
-
+# from robot_class import location_extraction
+# x = location_extraction(robots)
 # import matplotlib.pyplot as plt
-# x = initial_location
-# plt.figure("routing")
+# plt.figure("final position")
 # plt.scatter(x[:,0],x[:,1])
 # n = range(N+K)
 # for i,txt in enumerate(n):

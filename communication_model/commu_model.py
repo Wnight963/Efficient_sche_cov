@@ -13,8 +13,8 @@ def optimal_routing(x, leader_index):
     ####################################### prepare some parameters
     N = 10
     K = 1
-    source_data = 0.5
-    #this parameter needs to be small, or it's hard to find optimal solution
+    source_data = 0.2
+    #this parameter needs to be small, otherwise it's hard to find optimal solution
     time_start=time.time()
     ####################################### compute channel capacity
     from channel_capa import Capacity
@@ -22,7 +22,7 @@ def optimal_routing(x, leader_index):
     for i in range(N):
         for j in range(N+K):
             R[i,j] = Capacity(x[i], x[j])
-    # np.save("R.npy", R)
+
 
     #######################################inquality constraints
     G2 = np.eye(N)
@@ -43,8 +43,9 @@ def optimal_routing(x, leader_index):
     G3 = -np.eye(N*(N+K))
     G = np.vstack((G1, G2, G3))
 
-    h1 = -np.zeros([N, 1])
-    h1[leader_index] = -source_data
+    # h1 = -np.zeros([N, 1])
+    # h1[leader_index] = -source_data
+    h1 = -source_data * np.ones([N, 1])
     h2 = np.ones([N, 1])
     h3 = np.zeros([N*(N+K), 1])
     h = np.vstack((h1, h2, h3))
@@ -54,7 +55,7 @@ def optimal_routing(x, leader_index):
     p = np.zeros([N*(N+K), 1])
 
     #######################################sovle!
-    # all the coefficients must be converted into cvxopt.matrrix, np.array can't be
+    # all the coefficients must be converted into cvxopt.matrix, np.array can't be
     # accepted by solver.qp
     Q = matrix(Q)
     p = matrix(p)
@@ -66,6 +67,7 @@ def optimal_routing(x, leader_index):
     T = np.array(sol['x'])
     T = T.reshape([N, N+K], order="F")
     time_end = time.time()
+    # print('time cost %f s' % (time_end-time_start))
     if(sol['status']=='optimal'):
         from routing_present import routing
         transmission = T * R
@@ -73,5 +75,5 @@ def optimal_routing(x, leader_index):
         return sol, transmission
     else:
         return sol, False
-    # print('time cost %f s' % (time_end-time_start))
+
 
