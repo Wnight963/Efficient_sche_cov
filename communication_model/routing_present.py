@@ -9,7 +9,7 @@ def routing(x, leader_index, transmission, N, K):
     n = range(N+K)
     for i,txt in enumerate(n):
         plt.annotate(txt, (x[i,0],x[i,1]))             # number the points
-    plt.annotate('leader', x[leader_index])
+    # plt.annotate('leader', x[leader_index])
     for i in range(N):
         for j in range(N+K):
             if transmission[i,j]>0:

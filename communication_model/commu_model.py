@@ -4,7 +4,7 @@
 
 def optimal_routing(x, leader_index):
     # input: x: locations of robots; lead_index
-    # output: solution, amount of transmitted data
+    # output: solution, routing strategy
     import numpy as np
     from cvxopt import matrix, solvers
     import time
@@ -72,7 +72,7 @@ def optimal_routing(x, leader_index):
         from routing_present import routing
         transmission = T * R
         routing(x, leader_index, transmission, N, K)
-        return sol, transmission
+        return sol, T
     else:
         return sol, False
 

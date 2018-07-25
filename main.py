@@ -1,6 +1,7 @@
 from robot_class import ROBOT
 from robot_class import leader_election
 from robot_class import leader_move
+from robot_class import recruit_election
 
 import numpy as np
 N = 11    # number of robots
@@ -12,7 +13,7 @@ target = np.array([1.6, 1.6])
 
 initial_location = np.random.uniform(0, 0.2, size=[N+K,2])
 
-robots = [ROBOT(i, initial_location[i], {}) for i in range(N+K)]
+robots = [ROBOT(i, initial_location[i]) for i in range(N+K)]
 
 ############################################### leader election, leader moves and get stucked
 ############################################### in local stationary
