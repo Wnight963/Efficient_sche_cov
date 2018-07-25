@@ -80,8 +80,11 @@ def optimal_routing(x):
 
 
 
-def ci(x, T):
+def ci(x, index, T):
     R = np.zeros([N, N + K])
     for i in range(N):
         for j in range(N + K):
             R[i, j] = Capacity(x[i], x[j])
+    tmp = T * R
+    ci = sum(tmp[index, :]) - sum(tmp[:, index]) - source_data
+    return ci

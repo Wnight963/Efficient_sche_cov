@@ -45,7 +45,7 @@ def routing_strategy_extraction(robot_list):
     routing_strategy = robot_list[0].routing_strategy
     for i in range(1, M):
         routing_strategy = np.vstack((routing_strategy, robot_list[i].routing_strategy))
-    return routing_strategy
+    return routing_strategy[0:N]
 
 def leader_index_extraction(robot_list):
     for x in robot_list:
@@ -54,7 +54,7 @@ def leader_index_extraction(robot_list):
 
 def leader_election(robot_list, target): # waiting to be modefied into distributed fashion
 
-    #input: a list of robot; output: leader of these robots via consensus
+    'input: a list of robot; output: leader of these robots via consensus'
 
     location = location_extraction(robot_list)
     distance = [LA.norm(x-target) for x in location]
@@ -65,7 +65,7 @@ def leader_election(robot_list, target): # waiting to be modefied into distribut
 def recruit_election(robot_list):
     routing_strategy = routing_strategy_extraction(robot_list)
     leader_index = leader_index_extraction(robot_list)
-    T = list(routing_strategy[leader_index,:])
+    T = list(routing_strategy[leader_index,:])[0:N+K-1]
     recruit_index = T.index(min(T))
     robot_list[recruit_index].role_update('node')
     return robot_list, recruit_index
@@ -73,8 +73,8 @@ def recruit_election(robot_list):
 
 def leader_move(robot_list,leader_index, target):
 
-    #leader moves towards the target, until communication constraints are breaked
-    #to determine the farest position leader can reach, we use a binary search
+    'leader moves towards the target, until communication constraints are breake'
+    'to determine the farest position leader can reach, we use a binary search'
 
     from commu_model import optimal_routing
     location = location_extraction(robot_list)
@@ -98,25 +98,27 @@ def leader_move(robot_list,leader_index, target):
 
 def single_node_move(robot_list, single_moving_node_index, destination, routing_strategy, sigma):
 
-    #leader moves towards the target, until communication constraints are breaked
-    #to determine the farest position leader can reach, we use a binary search
+    'leader moves towards the target, until communication constraints are breaked'
+    'to determine the farest position leader can reach, we use a binary search'
+    'return new location of that moving node'
 
-    from commu_model import optimal_routing
+    print('before moving:')
+    print(robot_list[single_moving_node_index].location)
+    from commu_model import ci
     location = location_extraction(robot_list)
     a, b = robot_list[single_moving_node_index].location, destination
-    b = sigma/LA.norm(b-a)*(b-a) + a
+    b = (sigma/(LA.norm(b-a)))*(b-a) + a
     while(1):
         new_location = (a+b)/2
         if(LA.norm(new_location-a)<=0.02):
-            break
+            print('after moving:')
+            print(robot_list[single_moving_node_index].location)
+            return a
         else:
             location[single_moving_node_index] = new_location
-            # res, routing_result = optimal_routing(location, single_moving_node_index)
-            # if(res['status']=='optimal'):
-            #     robot_list[single_moving_node_index].location_update(new_location)
-            #     for i in range(N):
-            #         robot_list[i].routing_strategy_update(routing_result[i, :])
-            #     a = new_location
-            # else:
-            #     b = new_location
-    return robot_list
+            res = ci(location, single_moving_node_index, routing_strategy)
+            if(res>=0):
+                a = new_location
+            else:
+                b = new_location
+
