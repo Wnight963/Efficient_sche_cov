@@ -66,7 +66,9 @@ def recruit_election(robot_list):
     routing_strategy = routing_strategy_extraction(robot_list)
     leader_index = leader_index_extraction(robot_list)
     T = list(routing_strategy[leader_index,:])
-    return T.index(min(T))
+    recruit_index = T.index(min(T))
+    robot_list[recruit_index].role_update('node')
+    return robot_list, recruit_index
 
 
 def leader_move(robot_list,leader_index, target):
@@ -83,7 +85,7 @@ def leader_move(robot_list,leader_index, target):
             break
         else:
             location[leader_index] = new_location
-            res, routing_result = optimal_routing(location, leader_index)
+            res, routing_result = optimal_routing(location)
             if(res['status']=='optimal'):
                 robot_list[leader_index].location_update(new_location)
                 for i in range(N):
@@ -91,4 +93,30 @@ def leader_move(robot_list,leader_index, target):
                 a = new_location
             else:
                 b = new_location
+    return robot_list
+
+
+def single_node_move(robot_list, single_moving_node_index, destination, routing_strategy, sigma):
+
+    #leader moves towards the target, until communication constraints are breaked
+    #to determine the farest position leader can reach, we use a binary search
+
+    from commu_model import optimal_routing
+    location = location_extraction(robot_list)
+    a, b = robot_list[single_moving_node_index].location, destination
+    b = sigma/LA.norm(b-a)*(b-a) + a
+    while(1):
+        new_location = (a+b)/2
+        if(LA.norm(new_location-a)<=0.02):
+            break
+        else:
+            location[single_moving_node_index] = new_location
+            # res, routing_result = optimal_routing(location, single_moving_node_index)
+            # if(res['status']=='optimal'):
+            #     robot_list[single_moving_node_index].location_update(new_location)
+            #     for i in range(N):
+            #         robot_list[i].routing_strategy_update(routing_result[i, :])
+            #     a = new_location
+            # else:
+            #     b = new_location
     return robot_list

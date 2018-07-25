@@ -1,23 +1,25 @@
 #######################################
 #######################################
 # this program computes commnication model of robot networks and display it.
+import numpy as np
+from cvxopt import matrix, solvers
+from channel_capa import Capacity
 
-def optimal_routing(x, leader_index):
+N = 11
+K = 1
+source_data = 0.2
+
+def optimal_routing(x):
     # input: x: locations of robots; lead_index
     # output: solution, routing strategy
-    import numpy as np
-    from cvxopt import matrix, solvers
+
     import time
-
-
     ####################################### prepare some parameters
-    N = 11
-    K = 1
-    source_data = 0.2
+
     #this parameter needs to be small, otherwise it's hard to find optimal solution
     time_start=time.time()
     ####################################### compute channel capacity
-    from channel_capa import Capacity
+
     R = np.zeros([N, N+K])
     for i in range(N):
         for j in range(N+K):
@@ -69,11 +71,17 @@ def optimal_routing(x, leader_index):
     time_end = time.time()
     # print('time cost %f s' % (time_end-time_start))
     if(sol['status']=='optimal'):
-        from routing_present import routing
+        from routing_present import routing_graph
         transmission = T * R
-        routing(x, leader_index, transmission, N, K)
+        routing_graph(x, transmission, N, K)
         return sol, T
     else:
         return sol, False
 
 
+
+def ci(x, T):
+    R = np.zeros([N, N + K])
+    for i in range(N):
+        for j in range(N + K):
+            R[i, j] = Capacity(x[i], x[j])
