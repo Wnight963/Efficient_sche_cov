@@ -1,5 +1,10 @@
-import matplotlib.pyplot as plt
+import pickle
+from robot_class import ROBOT
 
-plt.figure('1')
-plt.scatter(1,1)
-plt.savefig('picture/1'+'2')
+f = open('store.pckl', 'rb')
+obj = pickle.load(f)
+f.close()
+
+print(obj)
+for x in obj:
+    print(x.number, x.role, x.location)

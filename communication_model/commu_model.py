@@ -62,6 +62,7 @@ def optimal_routing(x):
     h = matrix(h)
 
     solvers.options['show_progress'] = False
+    solvers.options['maxiters'] = 1000
     solvers.options['maxiters'] = 100
     sol=solvers.qp(Q, p, G, h)
     T = np.array(sol['x'])

@@ -127,6 +127,9 @@ def leader_move(robot_list,leader_index, target):
                 a = new_location
             else:
                 b = new_location
+
+    print("leader moves successfully!")
+    print(robot_list[leader_index].location)
     return robot_list
 
 
@@ -158,7 +161,8 @@ def single_node_move(location_of_robot, single_moving_node_index, destination, r
         else:
             location[single_moving_node_index] = new_location
             res = [ci(location, i, routing_strategy) for i in range(N)]
-            # check if the packet routing condition is obeyed
+            # check if the packet routing condition is obeyed, for all robots after a single
+            # one moves
             if(min(res)>=-0.01):
                 # using a small negetive number rather than zero is because
                 # a slightly breaking of communication constraint is not very harmful

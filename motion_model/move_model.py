@@ -65,9 +65,10 @@ def active_team_move(robot_list, moving_robot_index, target):
                         x.routing_strategy_update(routing_strategy[i])
             else:
             # otherwise, break, keep locations and routing strategies of last time
+                print('fail to find optimal routing!')
                 print('BERAK2')
                 break
             location = new_location.copy()
-        routing_graph(location, transmission(location, routing_strategy), N, K)
+        # routing_graph(location, transmission(location, routing_strategy), N, K)
     print("ACTIVE MOVING TERMINATED!")
     return robot_list
