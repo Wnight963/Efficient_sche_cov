@@ -14,28 +14,38 @@ N = 11    # number of robots
 K = 1     # number of base station
 
 
-target = np.array([5.6, 3.6])
+target = np.array([5.6, 3.0])
 # location is represented by np.array
 
 initial_location = np.random.uniform(0, 0.2, size=[N+K,2])
 
 robots = [ROBOT(i, initial_location[i]) for i in range(N+K)]
-
+robots[-1].role_update('AP')
 ############################################### leader election, leader moves and get stucked
 ############################################### in local stationary
 robots, leader_index = leader_election(robots, target)
 robots = leader_move(robots, leader_index, target)
 
-############################################### recruit election,
-robots, recruit_index = recruit_election(robots)
-moving_robot_index = [recruit_index, leader_index]
-robots = active_team_move(robots, moving_robot_index, target)
+############################################### recruit election
+moving_robot_index = [leader_index]
+# robots, recruit_index = recruit_election(robots)
+# moving_robot_index.insert(0, recruit_index)
+# robots = active_team_move(robots, moving_robot_index, target)
+# robots, recruit_index = recruit_election(robots)
+# moving_robot_index.insert(0, recruit_index)
+# robots = active_team_move(robots, moving_robot_index, target)
+# robots, recruit_index = recruit_election(robots)
+# moving_robot_index.insert(0, recruit_index)
+# robots = active_team_move(robots, moving_robot_index, target)
 
 
 
-# while(LA.norm(robots[leader_index].location-target)>=0.01):
-#     robots = active_team_move(robots)
-#     robots, recruit_index = recruit_election(robots)
+while(LA.norm(robots[leader_index].location-target)>=0.1):
+    robots, recruit_index = recruit_election(robots)
+    print("recruit_index:")
+    print(recruit_index)
+    moving_robot_index.insert(0, recruit_index)
+    robots = active_team_move(robots, moving_robot_index, target)
 
 # from robot_class import single_node_move
 # import sys
@@ -44,6 +54,8 @@ robots = active_team_move(robots, moving_robot_index, target)
 # single_node_move(robots, recruit_index,robots[leader_index].location,
 #                   routing_strategy_extraction(robots), sigma=0.1)
 
+for x in robots:
+    print(x.number, x.role)
 
 
 

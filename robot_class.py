@@ -9,10 +9,11 @@ from commu_model import ci
 N = 11
 K = 1
 
+
 class ROBOT:
     'data structure of robot'
 
-    role_set = set(['node', 'redundant_node', 'junction', 'leaf', 'leader'])
+    role_set = set(['node', 'redundant_node', 'junction', 'leaf', 'leader', 'AP'])
     def __init__(self, number, location, routing_strategy=np.zeros([1, N+K]), role='redundant_node'):
         self.number = number
         self.location = location
@@ -37,26 +38,46 @@ class ROBOT:
 
 
 def location_extraction(robot_list):
+
     'input: a list of robots, output: location of robots, np.ndarray, shape (robot number, 2)'
+
     M = len(robot_list)
     location = robot_list[0].location
     for i in range(1, M):
         location = np.vstack((location, robot_list[i].location))
     return location
 
+
 def routing_strategy_extraction(robot_list):
+
     'output: routing strategy of robots from 0 to N-1, the last K are APs and are overlooked'
+
     M = len(robot_list)
     routing_strategy = robot_list[0].routing_strategy
     for i in range(1, M):
         routing_strategy = np.vstack((routing_strategy, robot_list[i].routing_strategy))
     return routing_strategy[0:N]
 
+
 def leader_index_extraction(robot_list):
+
     'return number of robot whose role is "leader"'
+
     for x in robot_list:
         if(x.role=='leader'):
             return x.number
+
+
+def redundant_node_index_extraction(robot_list):
+
+    'return list of redundant node index'
+
+    res = []
+    for x in robot_list:
+        if(x.role=='redundant_node'):
+            res.append(x.number)
+    return res
+
 
 def leader_election(robot_list, target): # waiting to be modefied into distributed fashion
 
@@ -68,16 +89,19 @@ def leader_election(robot_list, target): # waiting to be modefied into distribut
     robot_list[leader_index].role_update('leader')
     return robot_list, leader_index
 
+
 def recruit_election(robot_list):
 
     'input: a list of robot; output: recruit of these robots via consensus'
 
-    routing_strategy = routing_strategy_extraction(robot_list)
-    leader_index = leader_index_extraction(robot_list)
-    T = list(routing_strategy[leader_index,:])[0:N+K-1]
-    recruit_index = T.index(min(T))
-    robot_list[recruit_index].role_update('node')
-    return robot_list, recruit_index
+    import random
+    redundant_node_index = redundant_node_index_extraction(robot_list)
+    if(len(redundant_node_index)):
+        recruit_index = random.sample(redundant_node_index, 1)[0]
+        robot_list[recruit_index].role_update('node')
+        return robot_list, recruit_index
+    else:
+        print("there is no redundant node, all nodes are occupied!")
 
 
 def leader_move(robot_list,leader_index, target):
@@ -110,8 +134,6 @@ def single_node_move(location_of_robot, single_moving_node_index, destination, r
     'robot moves towards the destination, with given communication constraints obeyed'
     'to determine the farest position leader can reach, we use a binary search'
     'return new location of that moving node'
-
-
 
     location = location_of_robot.copy()
     # this is important! to copy a list in python, The operator [:] returns a slice of a sequence.
