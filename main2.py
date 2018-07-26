@@ -18,7 +18,7 @@ target = np.array([5.6, 3.0])
 # location is represented by np.array
 
 import pickle
-f = open('store.pckl', 'rb')
+f = open('robots_initial.pckl', 'rb')
 robots = pickle.load(f)
 f.close()
 # these robots can configured completing the first task
