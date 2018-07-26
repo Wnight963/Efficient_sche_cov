@@ -19,8 +19,8 @@ def routing_graph(x, transmission, N, K):
                 a = x[[i,j],0]
                 b = x[[i,j],1]
                 plt.plot(a, b, linewidth=50*transmission[i,j])       # thickness denotes transmmision rate
-    plt.ion()
-    plt.pause(0.5)
-    plt.close()
-    # plt.show()
+    # plt.ion()
+    # plt.pause(0.5)
+    # plt.close()
+    plt.show()
     return

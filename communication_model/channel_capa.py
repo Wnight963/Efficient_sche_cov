@@ -15,7 +15,7 @@ def Capacity(x,y):
     elif distance<u:
         return 1
     else:
-        a = 5/8 * distance - 1/4
+        a = -5/8 * distance + 5/4
         return a
 
 

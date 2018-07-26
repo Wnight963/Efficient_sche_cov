@@ -102,6 +102,7 @@ def recruit_election(robot_list):
         return robot_list, recruit_index
     else:
         print("there is no redundant node, all nodes are occupied!")
+        return False
 
 
 def leader_move(robot_list,leader_index, target):
@@ -146,10 +147,11 @@ def single_node_move(location_of_robot, single_moving_node_index, destination, r
     # print(destination)
 
     a, b = location[single_moving_node_index], destination
+    sigma = min(sigma, LA.norm(b-a))
     b = (sigma/(LA.norm(b-a)))*(b-a) + a
     while(1):
         new_location = (a+b)/2
-        if(LA.norm(new_location-a)<=0.0002):
+        if(LA.norm(new_location-a)<=0.02):
             # print('after moving:')
             # print(a)
             return a
@@ -157,7 +159,10 @@ def single_node_move(location_of_robot, single_moving_node_index, destination, r
             location[single_moving_node_index] = new_location
             res = ci(location, single_moving_node_index, routing_strategy)
             # check if the packet routing condition is obeyed
-            if(res>=0):
+            if(res>=-0.01):
+                # using a small negetive number rather than zero is because
+                # a slightly breaking of communication constraint is not very harmful
+                # and allow robots to move more efficiently
                 a = new_location
             else:
                 b = new_location

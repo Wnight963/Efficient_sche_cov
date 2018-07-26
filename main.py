@@ -25,28 +25,29 @@ robots[-1].role_update('AP')
 ############################################### in local stationary
 robots, leader_index = leader_election(robots, target)
 robots = leader_move(robots, leader_index, target)
-
-############################################### recruit election
 moving_robot_index = [leader_index]
+############################################### recruit election
+
+robots, recruit_index = recruit_election(robots)
+moving_robot_index.insert(0, recruit_index)
+robots = active_team_move(robots, moving_robot_index, target)
 # robots, recruit_index = recruit_election(robots)
 # moving_robot_index.insert(0, recruit_index)
 # robots = active_team_move(robots, moving_robot_index, target)
 # robots, recruit_index = recruit_election(robots)
 # moving_robot_index.insert(0, recruit_index)
 # robots = active_team_move(robots, moving_robot_index, target)
-# robots, recruit_index = recruit_election(robots)
-# moving_robot_index.insert(0, recruit_index)
-# robots = active_team_move(robots, moving_robot_index, target)
 
 
 
-while(LA.norm(robots[leader_index].location-target)>=0.1):
-    robots, recruit_index = recruit_election(robots)
-    print("recruit_index:")
-    print(recruit_index)
-    moving_robot_index.insert(0, recruit_index)
-    robots = active_team_move(robots, moving_robot_index, target)
-
+# while(LA.norm(robots[leader_index].location-target)>=0.1):
+#     robots, recruit_index = recruit_election(robots)
+#     print("recruit_index:")
+#     print(recruit_index)
+#     moving_robot_index.insert(0, recruit_index)
+#     robots = active_team_move(robots, moving_robot_index, target)
+# if(LA.norm(robots[leader_index].location-target)<0.1):
+#     print("task completed!")
 # from robot_class import single_node_move
 # import sys
 # sys.path.append(r'../communication_model')
