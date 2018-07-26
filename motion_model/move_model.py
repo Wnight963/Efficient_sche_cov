@@ -19,7 +19,7 @@ def active_team_move(robot_list, moving_robot_index, target):
     'moving robot index is an orded set, the first one is nearest to the AP,'
     'the last one is leader'
 
-    sigma = 1
+    sigma = 0.1
     # moving radius, the less, the accurate
     location = location_extraction(robot_list)
     new_location = location.copy()
@@ -31,19 +31,28 @@ def active_team_move(robot_list, moving_robot_index, target):
     while(1):
         for i in range(team_length):
             if(i<team_length-1):
+                # print('before moving: %d' % moving_robot_index[i])
+                # print(location[moving_robot_index[i]])
+
                 new_location[moving_robot_index[i]] = \
                     single_node_move(location, moving_robot_index[i],
                                      location[moving_robot_index[i+1]], routing_strategy, sigma)
+                # print('after moving: %d' % moving_robot_index[i])
+                # print(new_location[moving_robot_index[i]])
             else:
+
+                # print('before moving: %d' % moving_robot_index[i])
+                # print(location[moving_robot_index[i]])
                 new_location[moving_robot_index[i]] = single_node_move(location, moving_robot_index[i],
                                      target, routing_strategy, sigma)
-        if(max(LA.norm((new_location-location), axis=1))<=0.001):
+                # print('after moving: %d' % moving_robot_index[i])
+                # print(new_location[moving_robot_index[i]])
+        if(max(LA.norm((new_location-location), axis=1))<=0.02):
             # if new_location is the same as current location, break
             print('BREAK1')
             break
         else:
             print('calculate optimal routing')
-            print(new_location)
             res, routing_strategy = optimal_routing(new_location)
             # calculate routing_strategy for current locations
             # if solvable(find optimal solution), record these locations to robots

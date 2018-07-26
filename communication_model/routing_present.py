@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import datetime
 
 def routing_graph(x, transmission, N, K):
 
@@ -19,8 +19,12 @@ def routing_graph(x, transmission, N, K):
                 a = x[[i,j],0]
                 b = x[[i,j],1]
                 plt.plot(a, b, linewidth=50*transmission[i,j])       # thickness denotes transmmision rate
-    # plt.ion()
-    # plt.pause(0.5)
-    # plt.close()
-    plt.show()
+    plt.ion()
+    plt.pause(0.2)
+    plt.close()
+    # plt.show()
+
+    # now_time = datetime.datetime.now()
+    # name = datetime.datetime.strftime(now_time,'%Y-%m-%d %H_%M_%S')
+    # plt.savefig('picture/'+name)
     return

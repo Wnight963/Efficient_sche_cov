@@ -24,7 +24,7 @@ def optimal_routing(x):
     for i in range(N):
         for j in range(N+K):
             R[i,j] = Capacity(x[i], x[j])
-    R = 1000*R
+
     #######################################inquality constraints
     G2 = np.eye(N)
     for i in range(N+K-1):
@@ -70,8 +70,8 @@ def optimal_routing(x):
     # print('time cost %f s' % (time_end-time_start))
     if(sol['status']=='optimal'):
         from routing_present import routing_graph
-        transmission = T * R
-        routing_graph(x, transmission, N, K)
+        # transmission = T * R
+        # routing_graph(x, transmission, N, K)
         return sol, T
     else:
         return sol, False
