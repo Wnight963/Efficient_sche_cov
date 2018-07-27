@@ -69,6 +69,6 @@ def active_team_move(robot_list, moving_robot_index, target):
                 print('BERAK2')
                 break
             location = new_location.copy()
-        # routing_graph(location, transmission(location, routing_strategy), N, K)
+        routing_graph(location, transmission(location, routing_strategy), N, K)
     print("ACTIVE MOVING TERMINATED!")
     return robot_list

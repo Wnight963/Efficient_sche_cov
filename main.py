@@ -1,3 +1,5 @@
+# 1st task
+
 from robot_class import ROBOT
 from robot_class import leader_election
 from robot_class import leader_move

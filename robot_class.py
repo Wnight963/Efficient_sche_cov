@@ -83,9 +83,8 @@ def leader_election(robot_list, target): # waiting to be modefied into distribut
 
     'input: a list of robot; output: leader of these robots via consensus'
 
-    location = location_extraction(robot_list)
-    distance = [LA.norm(x-target) for x in location]
-    leader_index = distance.index(min(distance[0:N]))
+    distance = [LA.norm(x.location-target) for x in robot_list if x.role=='redundant_node' or 99999]
+    leader_index = distance.index(min(distance))
     robot_list[leader_index].role_update('leader')
     return robot_list, leader_index
 
