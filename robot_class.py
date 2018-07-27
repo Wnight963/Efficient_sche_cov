@@ -1,4 +1,5 @@
 import numpy as np
+import networkx as nx
 import numpy.linalg as LA
 import sys
 
@@ -200,7 +201,23 @@ def robot_network_extraction(robots):
     return G
 
 
+def subgroup_extraction(original_list, word):
 
+    "input: original list, like:['R', 'N', 'N', 'J', 'N', 'N', 'J', 'N', 'N']"
+    "word, a list of what word to extract, like: ['J', 'J']"
+    "return [['R', 'N', 'N'], ['J', 'N', 'N'], ['J', 'N', 'N']]"
+
+    b = original_list
+    print(b)
+    c = [i for i, x in enumerate(b) if x in word]
+    print(c)
+    sum = [b[0:c[0]]]
+    for i in range(len(c)):
+        if (i == len(c) - 1):
+            sum.append(b[c[i]:])
+        else:
+            sum.append(b[c[i]:c[i + 1]])
+    return sum
 
 
 def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_index,
@@ -216,14 +233,12 @@ def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_in
     # then replace the AP with previously recruit robot. In this way, the fault that there may
     # exist no path from recruit to recruit_inducer is avoided.
     roles_in_2nd_leader_team = [robots[x].role for x in shortest_path]
-    subgroup = []
     if(after_leader_election==True):
-        break_node = ['junction', 'leader']
-
+        break_role = ['junction', 'leader']
+        subgroup_of_2nd_leader_team = subgroup_extraction(roles_in_2nd_leader_team, break_role)
     else:
-        break_node = ['junction', 'leaf']
-
-
-    return
+        break_role = ['junction', 'leaf']
+        subgroup_of_2nd_leader_team = subgroup_extraction(roles_in_2nd_leader_team, break_role)
+    return subgroup_of_2nd_leader_team
 
 

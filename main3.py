@@ -36,6 +36,7 @@ routing_graph_for_robot_list(robots)
 
 target2 = np.array([8, 3.2])
 robots, leader_index = leader_election(robots, target)
+robots, recruit_index = recruit_election(robots)
 import networkx as nx
 import matplotlib.pyplot as plt
 from robot_class import channel_matrix_extraction
@@ -53,5 +54,6 @@ print(shortest_path)
 print([robots[x].role for x in shortest_path])
 nx.draw(G, with_labels=True, font_weight='bold')
 plt.show()
-
+from robot_class import secondary_leader_team_construction
+print(secondary_leader_team_construction(robots, recruit_index, leader_index, after_leader_election=True))
 
