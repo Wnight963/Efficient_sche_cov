@@ -10,7 +10,7 @@ def routing_graph(x, transmission, N, K):
     plt.figure("routing")
     plt.scatter(x[:,0],x[:,1])
     plt.scatter(5.6, 3.0)
-    plt.scatter(-2, -2)
+    plt.scatter(8, 3.2)
     n = range(N+K)
     for i,txt in enumerate(n):
         plt.annotate(txt, (x[i,0],x[i,1]))             # number the points
@@ -21,11 +21,11 @@ def routing_graph(x, transmission, N, K):
                 a = x[[i,j],0]
                 b = x[[i,j],1]
                 plt.plot(a, b, linewidth=50*transmission[i,j])       # thickness denotes transmmision rate
-    plt.ion()
-    plt.pause(0.2)
-    plt.close()
+    # plt.ion()
+    # plt.pause(0.2)
+    # plt.close()
 
-    # plt.show()
+    plt.show()
 
     # now_time = datetime.datetime.now()
     # name = datetime.datetime.strftime(now_time,'%Y-%m-%d %H_%M_%S')

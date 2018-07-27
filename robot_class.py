@@ -48,9 +48,22 @@ def location_extraction(robot_list):
     return location
 
 
+def channel_matrix_extraction(robot_list):
+
+    'output: channel matrix between robots, a np.array, shape: N*(N+K)'
+
+    from channel_capa import Capacity
+    x = location_extraction(robot_list)
+    R = np.zeros([N, N + K])
+    for i in range(N):
+        for j in range(N + K):
+            R[i, j] = Capacity(x[i], x[j])
+    return R
+
 def routing_strategy_extraction(robot_list):
 
     'output: routing strategy of robots from 0 to N-1, the last K are APs and are overlooked'
+    'output is a np.array, shape: N*(N+K)'
 
     M = len(robot_list)
     routing_strategy = robot_list[0].routing_strategy
@@ -169,4 +182,48 @@ def single_node_move(location_of_robot, single_moving_node_index, destination, r
                 a = new_location
             else:
                 b = new_location
+
+
+def robot_network_extraction(robots):
+
+    'construct a robot communication network, nodes are robots, and edges exist if T*R>0'
+    'return a nx.DiGraph'
+
+    import networkx as nx
+    G = nx.DiGraph()
+    G.add_nodes_from(range(N + K))
+    T = routing_strategy_extraction(robots)
+    R = channel_matrix_extraction(robots)
+    transmission_data = T * R
+    edges = [(j, i) for i in range(N) for j in range(N + K) if transmission_data[i, j] > 0]
+    G.add_edges_from(edges)
+    return G
+
+
+
+
+
+def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_index,
+                                       after_leader_election=False):
+
+    'construct the secondary leader team, source node: the recruit,'
+    'target node: robot who induces recruit'
+
+    G = robot_network_extraction(robots)
+    shortest_path = nx.shortest_path(G, source=N+K-1, target=recruit_inducer_index)
+    # find the shortest path from AP to robot who induces recruit
+    shortest_path[0] = recruit_index
+    # then replace the AP with previously recruit robot. In this way, the fault that there may
+    # exist no path from recruit to recruit_inducer is avoided.
+    roles_in_2nd_leader_team = [robots[x].role for x in shortest_path]
+    subgroup = []
+    if(after_leader_election==True):
+        break_node = ['junction', 'leader']
+
+    else:
+        break_node = ['junction', 'leaf']
+
+
+    return
+
 
