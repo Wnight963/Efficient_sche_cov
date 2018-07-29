@@ -4,6 +4,7 @@ from robot_class import ROBOT
 from robot_class import leader_election
 from robot_class import leader_move
 from robot_class import recruit_election
+from robot_class import secondary_leader_team_construction
 import sys
 
 sys.path.append(r'motion_model')
@@ -36,9 +37,7 @@ routing_graph_for_robot_list(robots)
 
 
 target2 = np.array([8, 3.2])
-from robot_class import secondary_leader_team_construction
-robots, leader_index = leader_election(robots, target)
-robots, recruit_index = recruit_election(robots)
+
 
 # import networkx as nx
 # import matplotlib.pyplot as plt
@@ -57,8 +56,8 @@ robots, recruit_index = recruit_election(robots)
 # print([robots[x].role for x in shortest_path])
 # nx.draw(G, with_labels=True, font_weight='bold')
 # plt.show()
-
-
+robots, leader_index = leader_election(robots, target)
+robots, recruit_index = recruit_election(robots)
 if(robots[leader_index].pre_role!='redundant_node'):
 
     secondary_leader_team_index = secondary_leader_team_construction(
@@ -93,7 +92,11 @@ if(robots[leader_index].pre_role!='redundant_node'):
         primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
         robots[primary_leader_team[0]].role_update("node")
         robots = active_team_move(robots, primary_leader_team, target2)
-        
+    if (LA.norm(robots[leader_index].location - target) < 0.2):
+        print("task completed!")
+    for x in robots:
+        if (x.role == 'leader'):
+            x.role_update('leaf')
 
 
 
