@@ -15,23 +15,29 @@ class ROBOT:
     'data structure of robot'
 
     role_set = set(['node', 'redundant_node', 'junction', 'leaf', 'leader', 'AP'])
-    def __init__(self, number, location, routing_strategy=np.zeros([1, N+K]), role='redundant_node'):
+    def __init__(self, number, location, routing_strategy=np.zeros([1, N+K]),
+                 role='redundant_node', pre_role='redundant_node'):
         self.number = number
         self.location = location
         self.routing_strategy = routing_strategy
         self.role = role
+        self.pre_role = pre_role
     # routing_strategy: np.array(), shape 1*(N+K)
     # location: np.ndarray, raw represents robot, two colomns.
 
     def location_update(self, new_location):
         self.location = new_location
+        return
     def role_update(self, new_role):
         if(new_role in self.role_set):
+            self.pre_role = self.role
             self.role = new_role
         else:
             print("Error!")
+        return
     def routing_strategy_update(self, new_routing_strategy):
         self.routing_strategy = new_routing_strategy
+        return
 
 
 
@@ -201,14 +207,14 @@ def robot_network_extraction(robots):
     return G
 
 
-def subgroup_extraction(original_list, word):
+def subgroup_role_extraction(original_list, word):
 
     "input: original list, like:['R', 'N', 'N', 'J', 'N', 'N', 'J', 'N', 'N']"
     "word, a list of what word to extract, like: ['J', 'J']"
     "return [['R', 'N', 'N'], ['J', 'N', 'N'], ['J', 'N', 'N']]"
 
     b = original_list
-    print(b)
+    # print(b)
     c = [i for i, x in enumerate(b) if x in word]
     sum = [b[0:c[0]]]
     for i in range(len(c)):
@@ -217,6 +223,25 @@ def subgroup_extraction(original_list, word):
         else:
             sum.append(b[c[i]:c[i + 1]])
     return sum
+
+
+def subgroup_index_extraction(original_list, word):
+
+    "input: original list, like:['R', 'N', 'N', 'J', 'N', 'N', 'J', 'N', 'N', 'L']"
+    "word, a list of what word to extract, like: ['J', 'L']"
+    "return [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]"
+
+    b = original_list
+    # print(b)
+    c = [i for i, x in enumerate(b) if x in word]
+    sum = [list(range(c[0]))]
+    for i in range(len(c)):
+        if (i == len(c) - 1):
+            sum.append(list(range(c[i], len(original_list))))
+        else:
+            sum.append(list(range(c[i],c[i + 1])))
+    return sum
+
 
 
 def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_index,
@@ -234,10 +259,10 @@ def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_in
     roles_in_2nd_leader_team = [robots[x].role for x in shortest_path]
     if(after_leader_election==True):
         break_role = ['junction', 'leader']
-        subgroup_of_2nd_leader_team = subgroup_extraction(roles_in_2nd_leader_team, break_role)
     else:
         break_role = ['junction', 'leaf']
-        subgroup_of_2nd_leader_team = subgroup_extraction(roles_in_2nd_leader_team, break_role)
-    return subgroup_of_2nd_leader_team
+    subgroup_of_2nd_leader_team_index = subgroup_index_extraction(roles_in_2nd_leader_team, break_role)
+    res = [shortest_path[x[0]:(x[-1] + 1)] for x in subgroup_of_2nd_leader_team_index]
+    return res
 
 

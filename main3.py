@@ -26,22 +26,25 @@ f.close()
 # these robots are configured completing the first task
 
 
-print(robots)
+
 for x in robots:
-    print(x.number, x.role, x.location)
+    x.pre_role = "redundant_node"
+    print(x.number, x.role, x.pre_role, x.location)
 from routing_present import routing_graph_for_robot_list
 routing_graph_for_robot_list(robots)
 # graph visualized
 
 
 target2 = np.array([8, 3.2])
+from robot_class import secondary_leader_team_construction
 robots, leader_index = leader_election(robots, target)
 robots, recruit_index = recruit_election(robots)
-import networkx as nx
-import matplotlib.pyplot as plt
-from robot_class import channel_matrix_extraction
-from robot_class import routing_strategy_extraction
 
+# import networkx as nx
+# import matplotlib.pyplot as plt
+# from robot_class import channel_matrix_extraction
+# from robot_class import routing_strategy_extraction
+#
 # G = nx.DiGraph()
 # G.add_nodes_from(range(N+K))
 # T = routing_strategy_extraction(robots)
@@ -54,6 +57,46 @@ from robot_class import routing_strategy_extraction
 # print([robots[x].role for x in shortest_path])
 # nx.draw(G, with_labels=True, font_weight='bold')
 # plt.show()
-from robot_class import secondary_leader_team_construction
-print(secondary_leader_team_construction(robots, recruit_index, leader_index, after_leader_election=True))
+
+
+if(robots[leader_index].pre_role!='redundant_node'):
+
+    secondary_leader_team_index = secondary_leader_team_construction(
+        robots, recruit_index, leader_index, after_leader_election=True)
+    print(secondary_leader_team_index)
+    ###########
+    for i in range(len(secondary_leader_team_index)-1):
+        robots = active_team_move(robots, secondary_leader_team_index[i],
+                                  robots[secondary_leader_team_index[i+1][0]].location)
+        if(i<len(secondary_leader_team_index)-2):
+            tmp_role = robots[secondary_leader_team_index[i+1][0]].role
+        else:
+            tmp_role = robots[leader_index].pre_role
+        robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+    
+    ###########
+    primary_leader_team = [leader_index]
+    robots = active_team_move(robots, primary_leader_team, target2)
+    while(LA.norm(robots[leader_index].location-target2)>=0.2):
+        robots, recruit_index = recruit_election(robots)
+        secondary_leader_team_index = secondary_leader_team_construction(
+            robots, recruit_index, primary_leader_team[0], after_leader_election=False)
+        print(secondary_leader_team_index)
+        for i in range(len(secondary_leader_team_index) - 1):
+            robots = active_team_move(robots, secondary_leader_team_index[i],
+                                      robots[secondary_leader_team_index[i + 1][0]].location)
+            if (i < len(secondary_leader_team_index) - 2):
+                tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+            else:
+                tmp_role = robots[leader_index].pre_role
+            robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+        primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
+        robots[primary_leader_team[0]].role_update("node")
+        robots = active_team_move(robots, primary_leader_team, target2)
+        
+
+
+
+for x in robots:
+    print(x.number, x.role, x.pre_role, x.location)
 
