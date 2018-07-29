@@ -102,7 +102,8 @@ def redundant_node_index_extraction(robot_list):
 def leader_election(robot_list, target): # waiting to be modefied into distributed fashion
 
     'input: a list of robot; output: leader of these robots via consensus'
-
+    print("target:")
+    print(target)
     distance = [LA.norm(x.location-target) for x in robot_list if x.role=='redundant_node' or 99999]
     leader_index = distance.index(min(distance))
     robot_list[leader_index].role_update('leader')

@@ -32,38 +32,31 @@ robots = pickle.load(f)
 f.close()
 ############################################### leader election, leader moves and get stucked
 ############################################### in local stationary
-robots, leader_index = leader_election(robots, target)
-robots = leader_move(robots, leader_index, target)
-moving_robot_index = [leader_index]
-############################################### recruit election
-
-# robots, recruit_index = recruit_election(robots)
-# moving_robot_index.insert(0, recruit_index)
-# robots = active_team_move(robots, moving_robot_index, target)
-# robots, recruit_index = recruit_election(robots)
-# moving_robot_index.insert(0, recruit_index)
-# robots = active_team_move(robots, moving_robot_index, target)
-# robots, recruit_index = recruit_election(robots)
-# moving_robot_index.insert(0, recruit_index)
-# robots = active_team_move(robots, moving_robot_index, target)
 
 
 
-while(LA.norm(robots[leader_index].location-target)>=0.2):
-    robots, recruit_index = recruit_election(robots)
-    print("recruit_index:")
-    print(recruit_index)
-    moving_robot_index.insert(0, recruit_index)
-    robots = active_team_move(robots, moving_robot_index, target)
-if(LA.norm(robots[leader_index].location-target)<0.2):
-    print("task completed!")
+# robots, leader_index = leader_election(robots, target)
+# robots = leader_move(robots, leader_index, target)
+# moving_robot_index = [leader_index]
+# ############################################### recruit election
+#
+# while(LA.norm(robots[leader_index].location-target)>=0.2):
+#     robots, recruit_index = recruit_election(robots)
+#     print("recruit_index:")
+#     print(recruit_index)
+#     moving_robot_index.insert(0, recruit_index)
+#     robots = active_team_move(robots, moving_robot_index, target)
+# if(LA.norm(robots[leader_index].location-target)<0.2):
+#     print("task completed!")
 
 
+from move_model import scheduling_for_single_task
+robots = scheduling_for_single_task(robots, target)
 for x in robots:
     if (x.role == 'leader'):
         x.role_update('leaf')
     # since leader reached its destination, it becomes leaf node
-    print(x.number, x.role, x.location)
+    print(x.number, x.role, x.pre_role, x.location)
 
 
 

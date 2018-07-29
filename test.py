@@ -1,6 +1,7 @@
-a = [[0,1,2,3], [4,5],[6]]
-b = [2*x for x in range(7)]
-c = [b[x[0]:(x[-1]+1)] for x in a]
-print(b)
-print(a)
-print(c)
+import numpy as np
+
+task = [[4.6, 3.0], [4.8, 1.2], [4.3, 3.4], [3,0]]
+task = np.array(task)
+print(task)
+print(task[:,0])
+print(task[:,1])

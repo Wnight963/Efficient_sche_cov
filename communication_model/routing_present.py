@@ -9,8 +9,9 @@ def routing_graph(x, transmission, N, K):
 
     plt.figure("routing")
     plt.scatter(x[:,0],x[:,1])
-    plt.scatter(5.6, 3.0)
-    plt.scatter(8, 3.2)
+    task = [[4.6, 3.0], [4.8, 1.2], [4.3, 3.4], [3,0]]
+    task = np.array(task)
+    plt.scatter(task[:,0], task[:,1])
     n = range(N+K)
     for i,txt in enumerate(n):
         plt.annotate(txt, (x[i,0],x[i,1]))             # number the points

@@ -36,7 +36,7 @@ routing_graph_for_robot_list(robots)
 # graph visualized
 
 
-target2 = np.array([8, 3.2])
+target2 = np.array([4.8, 1.2])
 
 
 # import networkx as nx
@@ -56,14 +56,16 @@ target2 = np.array([8, 3.2])
 # print([robots[x].role for x in shortest_path])
 # nx.draw(G, with_labels=True, font_weight='bold')
 # plt.show()
-robots, leader_index = leader_election(robots, target)
+robots, leader_index = leader_election(robots, target2)
 robots, recruit_index = recruit_election(robots)
-if(robots[leader_index].pre_role!='redundant_node'):
+if(robots[leader_index].pre_role=='leaf'):
 
     secondary_leader_team_index = secondary_leader_team_construction(
         robots, recruit_index, leader_index, after_leader_election=True)
     print(secondary_leader_team_index)
-    ###########
+    ########### once the leader is elected and it's previous role is a leaf node
+    ########### a recruit election is immediately induced to release the leader from
+    ########### its previous location
     for i in range(len(secondary_leader_team_index)-1):
         robots = active_team_move(robots, secondary_leader_team_index[i],
                                   robots[secondary_leader_team_index[i+1][0]].location)
@@ -75,7 +77,9 @@ if(robots[leader_index].pre_role!='redundant_node'):
     
     ###########
     primary_leader_team = [leader_index]
+    ########## primary team now has only one member leader
     robots = active_team_move(robots, primary_leader_team, target2)
+    ########## primary team moves and gets trapped in local stationary point
     while(LA.norm(robots[leader_index].location-target2)>=0.2):
         robots, recruit_index = recruit_election(robots)
         secondary_leader_team_index = secondary_leader_team_construction(
@@ -92,14 +96,59 @@ if(robots[leader_index].pre_role!='redundant_node'):
         primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
         robots[primary_leader_team[0]].role_update("node")
         robots = active_team_move(robots, primary_leader_team, target2)
-    if (LA.norm(robots[leader_index].location - target) < 0.2):
+    if (LA.norm(robots[leader_index].location - target2)<0.2):
+        print("task completed!")
+    for x in robots:
+        if (x.role == 'leader'):
+            x.role_update('leaf')
+elif(robots[leader_index].pre_role == 'node' or robots[leader_index].pre_role == 'junction'):
+
+    secondary_leader_team_index = secondary_leader_team_construction(
+        robots, recruit_index, leader_index, after_leader_election=True)
+    print(secondary_leader_team_index)
+    ########### once the leader is elected and it's previous role is a leaf node
+    ########### a recruit election is immediately induced to release the leader from
+    ########### its previous location
+    for i in range(len(secondary_leader_team_index) - 1):
+        robots = active_team_move(robots, secondary_leader_team_index[i],
+                                  robots[secondary_leader_team_index[i + 1][0]].location)
+        if (i < len(secondary_leader_team_index) - 2):
+            tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+        else:
+            tmp_role = 'junction'
+        robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+
+    ###########
+    primary_leader_team = [leader_index]
+    ########## primary team now has only one member leader
+    robots = active_team_move(robots, primary_leader_team, target2)
+    ########## primary team moves and gets trapped in local stationary point
+    while (LA.norm(robots[leader_index].location - target2) >= 0.2):
+        robots, recruit_index = recruit_election(robots)
+        secondary_leader_team_index = secondary_leader_team_construction(
+            robots, recruit_index, primary_leader_team[0], after_leader_election=False)
+        print(secondary_leader_team_index)
+        for i in range(len(secondary_leader_team_index) - 1):
+            robots = active_team_move(robots, secondary_leader_team_index[i],
+                                      robots[secondary_leader_team_index[i + 1][0]].location)
+            if (i < len(secondary_leader_team_index) - 2):
+                tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+            else:
+                tmp_role = robots[leader_index].pre_role
+            robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+        primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
+        robots[primary_leader_team[0]].role_update("node")
+        robots = active_team_move(robots, primary_leader_team, target2)
+    if (LA.norm(robots[leader_index].location - target2) < 0.2):
         print("task completed!")
     for x in robots:
         if (x.role == 'leader'):
             x.role_update('leaf')
 
 
-
 for x in robots:
     print(x.number, x.role, x.pre_role, x.location)
 
+# f = open('robots_after_2st_task.pckl', 'wb')
+# pickle.dump(robots, f)
+# f.close()
