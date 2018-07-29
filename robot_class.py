@@ -210,7 +210,6 @@ def subgroup_extraction(original_list, word):
     b = original_list
     print(b)
     c = [i for i, x in enumerate(b) if x in word]
-    print(c)
     sum = [b[0:c[0]]]
     for i in range(len(c)):
         if (i == len(c) - 1):
