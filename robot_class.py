@@ -248,8 +248,7 @@ def subgroup_index_extraction(original_list, word):
 
 
 
-def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_index,
-                                       after_leader_election=False):
+def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_index):
 
     'construct the secondary leader team, source node: the recruit,'
     'target node: robot who induces recruit'
@@ -261,10 +260,11 @@ def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_in
     # then replace the AP with previously recruit robot. In this way, the fault that there may
     # exist no path from recruit to recruit_inducer is avoided.
     roles_in_2nd_leader_team = [robots[x].role for x in shortest_path]
-    if(after_leader_election==True):
-        break_role = ['junction', 'leader', 'leaf']
-    else:
-        break_role = ['junction', 'leaf']
+    # if(after_leader_election==True):
+    #     break_role = ['junction', 'leader', 'leaf']
+    # else:
+    #     break_role = ['junction', 'leaf']
+    break_role = ['junction', 'leader', 'leaf']
     subgroup_of_2nd_leader_team_index = subgroup_index_extraction(roles_in_2nd_leader_team, break_role)
     res = [shortest_path[x[0]:(x[-1] + 1)] for x in subgroup_of_2nd_leader_team_index]
     return res

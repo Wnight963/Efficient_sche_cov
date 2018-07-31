@@ -8,16 +8,13 @@ from channel_capa import Capacity
 N = 11
 K = 1
 source_data = 0.02
+#this parameter needs to be small, otherwise it's hard to find optimal solution
 
 def optimal_routing(x):
-    # input: x: locations of robots; lead_index
-    # output: solution, routing strategy
 
-    import time
-    ####################################### prepare some parameters
+    'input: x: locations of robots; lead_index'
+    'output: solution, routing strategy'
 
-    #this parameter needs to be small, otherwise it's hard to find optimal solution
-    time_start=time.time()
     ####################################### compute channel capacity
 
     R = np.zeros([N, N+K])
@@ -67,12 +64,7 @@ def optimal_routing(x):
     sol=solvers.qp(Q, p, G, h)
     T = np.array(sol['x'])
     T = T.reshape([N, N+K], order="F")
-    time_end = time.time()
-    # print('time cost %f s' % (time_end-time_start))
     if(sol['status']=='optimal'):
-        from routing_present import routing_graph
-        # transmission = T * R
-        # routing_graph(x, transmission, N, K)
         return sol, T
     else:
         return sol, False

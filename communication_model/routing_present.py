@@ -7,16 +7,16 @@ def routing_graph(x, transmission, N, K):
 
     'input: x:locations of robots'
 
-    # plt.figure("routing")
+
     plt.cla()
     plt.scatter(x[:,0],x[:,1])
-    task = [[3, 2.0], [3, 4], [5, 2], [5, 4]]
+    task = [[3, 2.0], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
     task = np.array(task)
     plt.scatter(task[:,0], task[:,1])
     n = range(N+K)
     for i,txt in enumerate(n):
         plt.annotate(txt, (x[i,0],x[i,1]))             # number the points
-    # plt.annotate('leader', x[leader_index])
+
     for i in range(N):
         for j in range(N+K):
             if transmission[i,j]>0:
@@ -26,7 +26,6 @@ def routing_graph(x, transmission, N, K):
     plt.ion()
     plt.pause(0.02)
     # plt.close()
-
     # plt.show()
 
     # now_time = datetime.datetime.now()
