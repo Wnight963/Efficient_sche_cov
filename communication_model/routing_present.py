@@ -2,14 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import datetime
 
-
+plt.figure("routing")
 def routing_graph(x, transmission, N, K):
 
     'input: x:locations of robots'
 
-    plt.figure("routing")
+    # plt.figure("routing")
+    plt.cla()
     plt.scatter(x[:,0],x[:,1])
-    task = [[4.6, 3.0], [4.8, 1.2], [4.3, 3.4], [3,0]]
+    task = [[3, 2.0], [3, 4], [5, 2], [5, 4]]
     task = np.array(task)
     plt.scatter(task[:,0], task[:,1])
     n = range(N+K)
@@ -23,8 +24,8 @@ def routing_graph(x, transmission, N, K):
                 b = x[[i,j],1]
                 plt.plot(a, b, linewidth=25*transmission[i,j])       # thickness denotes transmmision rate
     plt.ion()
-    plt.pause(0.2)
-    plt.close()
+    plt.pause(0.02)
+    # plt.close()
 
     # plt.show()
 

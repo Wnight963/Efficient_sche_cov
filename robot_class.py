@@ -172,6 +172,9 @@ def single_node_move(location_of_robot, single_moving_node_index, destination, r
     a, b = location[single_moving_node_index], destination
     sigma = min(sigma, LA.norm(b-a))
     b = (sigma/(LA.norm(b-a)))*(b-a) + a
+    if(LA.norm(b-a)<=0.02):
+        print("destination is near to start enough!")
+        return b
     while(1):
         new_location = (a+b)/2
         if(LA.norm(new_location-a)<=0.02):
@@ -259,7 +262,7 @@ def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_in
     # exist no path from recruit to recruit_inducer is avoided.
     roles_in_2nd_leader_team = [robots[x].role for x in shortest_path]
     if(after_leader_election==True):
-        break_role = ['junction', 'leader']
+        break_role = ['junction', 'leader', 'leaf']
     else:
         break_role = ['junction', 'leaf']
     subgroup_of_2nd_leader_team_index = subgroup_index_extraction(roles_in_2nd_leader_team, break_role)

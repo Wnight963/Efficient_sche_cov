@@ -50,18 +50,18 @@ def active_team_move(robot_list, moving_robot_index, target):
                                      target, routing_strategy, sigma)
                 # print('after moving: %d' % moving_robot_index[i])
                 # print(new_location[moving_robot_index[i]])
-        if(max(LA.norm((new_location-location), axis=1))<=0.02):
+        if(max(LA.norm((new_location-location), axis=1))<=0.002):
             # if new_location is the same as current location, break
             print('BREAK1')
             break
         else:
-            print('calculate optimal routing')
+            # print('calculate optimal routing')
             res, routing_strategy = optimal_routing(new_location)
             # calculate routing_strategy for current locations
             # if solvable(find optimal solution), record these locations to robots
             # and update routing strategies.
             if(res['status']=='optimal'):
-                print('this is optimal')
+                # print('this is optimal')
                 for i, x in enumerate(robot_list):
                     if (i < N):
                         x.location_update(location[i])
