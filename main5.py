@@ -34,4 +34,3 @@ for i in range(len(task)):
     # f = open(name, 'wb')
     # pickle.dump(robots, f)
     # f.close()
-
