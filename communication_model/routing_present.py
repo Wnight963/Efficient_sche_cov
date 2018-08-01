@@ -5,20 +5,25 @@ from matplotlib.patches import Circle
 
 fig = plt.figure("routing")
 ax = fig.add_subplot(111)
+
+user_x = 2*np.random.random(size=50)+3
+user_y = 2*np.random.random(size=50)+2
+
+
 def routing_graph(x, transmission, N, K):
 
     'input: x:locations of robots'
 
-
     ax.cla()
     ax.scatter(x[:, 0], x[:, 1])
+    ax.scatter(user_x, user_y, linewidths=0.01)
     for i in range(len(x)):
         cir = Circle(xy=(x[i, 0], x[i, 1]), radius=0.5, alpha=0.5)
         ax.add_patch(cir)
         # draw a circle around UAVs
     task = [[3, 2.0], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
     task = np.array(task)
-    ax.scatter(task[:, 0], task[:, 1])
+    ax.scatter(task[:, 0], task[:, 1], marker='x')
     n = range(N + K)
     for i, txt in enumerate(n):
         ax.annotate(txt, (x[i, 0], x[i, 1]))  # number the points
