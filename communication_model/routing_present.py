@@ -1,13 +1,29 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 import datetime
-from matplotlib.patches import Circle
+# from matplotlib.patches import Circle
+from matplotlib.patches import Rectangle
 
 fig = plt.figure("routing")
 ax = fig.add_subplot(111)
 
-user_x = 2*np.random.random(size=50)+3
-user_y = 2*np.random.random(size=50)+2
+f = open('user_equip_location.pckl', 'rb')
+user = pickle.load(f)
+f.close()
+
+global deteced_user
+deteced_user = []
+
+
+
+def if_is_detected(x, user):
+    distance = x - user
+    photo_range = np.array([0.5, 0.25])
+    dectected = [list(abs(n) < photo_range) for n in distance]
+    res = [True, True] in dectected
+    return res
+
 
 
 def routing_graph(x, transmission, N, K):
@@ -15,11 +31,25 @@ def routing_graph(x, transmission, N, K):
     'input: x:locations of robots'
 
     ax.cla()
+    # ax.grid(True, linestyle="-.", color="r", linewidth="3")
+    ax.axis([2.8, 5.2, 1.8, 4.2])
     ax.scatter(x[:, 0], x[:, 1])
-    ax.scatter(user_x, user_y, linewidths=0.01)
+
+    global deteced_user
+    residual_user = [x for x in user if x not in np.array(deteced_user)]
+    for n in residual_user:
+        if if_is_detected(x, n):
+            deteced_user.append(n)
+
+    if len(deteced_user):
+        ax.scatter(np.array(deteced_user)[:,0], np.array(deteced_user)[:,1], linewidths=1)
+
+
     for i in range(len(x)):
-        cir = Circle(xy=(x[i, 0], x[i, 1]), radius=0.5, alpha=0.5)
-        ax.add_patch(cir)
+        # cir = Circle(xy=(x[i, 0], x[i, 1]), radius=0.5, alpha=0.5)
+        xy = (x[i, 0] - 0.5, x[i, 1] - 0.25)
+        rec = Rectangle(xy, height=0.5, width=1, fill=False)
+        ax.add_patch(rec)
         # draw a circle around UAVs
     task = [[3, 2.0], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
     task = np.array(task)
