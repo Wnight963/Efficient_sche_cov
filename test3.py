@@ -19,20 +19,36 @@
 #
 
 
-# import numpy as np
-# import pickle
-# import matplotlib.pyplot as plt
-#
-# user = 2*np.random.random([400, 2]) +np.array([3,2])
-# plt.scatter(user[:,0], user[:,1], linewidths=1)
-# plt.grid(True)
-# plt.show()
-# print(user.shape)
-# f = open('user_equip_location.pckl', 'wb')
-# pickle.dump(user, f)
-# f.close()
+import numpy as np
+import pickle
+import matplotlib.pyplot as plt
 
-a = [1,2]
-b = [[1,2], [3,4]]
-print(type(a[0]))
-print(type(b[0])==list)
+task = []
+for i in range(5):
+    center = []
+    for j in range(10):
+        center.append([3.2+0.4*i, 3.1+0.2*j])
+    if i%2==0:
+        task.extend(center)
+    else:
+        center.reverse()
+        task.extend(center)
+task = np.array(task)
+
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+ax.axis([3,5,3,5])
+major_ticks = np.arange(3, 5, 0.4)
+minor_ticks = np.arange(3, 5, 0.2)
+ax.set_xticks(major_ticks)
+ax.set_yticks(major_ticks)
+ax.set_yticks(minor_ticks)
+ax.grid(which='both')
+plt.scatter(task[:,0], task[:,1])
+plt.show()
+
+
+
+
+
+

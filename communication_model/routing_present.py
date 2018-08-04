@@ -23,7 +23,7 @@ def if_is_detected(x, user):
     'x: locations of UAV, user: location of user'
 
     distance = x - user
-    photo_range = np.array([0.2, 0.12])
+    photo_range = np.array([0.5, 0.25])
     dectected = [list(abs(n) < photo_range) for n in distance]
     res = [True, True] in dectected
     return res
@@ -36,8 +36,13 @@ def routing_graph(x, transmission, N, K):
 
     ax.cla()
     # ax.grid(True, linestyle="-.", color="r", linewidth="3")
-    ax.axis([2.8, 5.2, 1.8, 4.2])
-    ax.grid(True)
+    ax.axis([3, 8, 3, 8])
+    major_ticks = np.arange(3, 8, 1)
+    minor_ticks = np.arange(3, 8, 0.5)
+    ax.set_xticks(major_ticks)
+    ax.set_yticks(major_ticks)
+    ax.set_yticks(minor_ticks)
+    ax.grid(which='both')
     ax.scatter(x[:, 0], x[:, 1])
 
     global deteced_user
@@ -51,14 +56,27 @@ def routing_graph(x, transmission, N, K):
 
 
     for i in range(len(x)):
-        cir = Circle(xy=(x[i, 0], x[i, 1]), radius=0.5, alpha=0.5)
-        ax.add_patch(cir)
-        # xy = (x[i, 0] - 0.2, x[i, 1] - 0.12)
-        # rec = Rectangle(xy, height=0.24, width=0.4, fill=False)
-        # ax.add_patch(rec)
+        # cir = Circle(xy=(x[i, 0], x[i, 1]), radius=0.5, alpha=0.5)
+        # ax.add_patch(cir)
+        xy = (x[i, 0] - 0.5, x[i, 1] - 0.25)
+        rec = Rectangle(xy, height=0.5, width=1, fill=False)
+        ax.add_patch(rec)
         # draw a circle around UAVs
-    task = [[3.2, 2.12], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
+    # task = [[3,3], [4,4]]
+    # task = np.array(task)
+
+    task = []
+    for i in range(5):
+        center = []
+        for j in range(10):
+            center.append([3.5 + 1 * i, 3.25 + 0.5 * j])
+        if i % 2 == 0:
+            task.extend(center)
+        else:
+            center.reverse()
+            task.extend(center)
     task = np.array(task)
+
     ax.scatter(task[:, 0], task[:, 1], marker='x')
     n = range(N + K)
     for i, txt in enumerate(n):

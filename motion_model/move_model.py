@@ -12,13 +12,26 @@ from commu_model import optimal_routing
 from commu_model import transmission
 from routing_present import routing_graph
 import numpy as np
+import networkx as nx
 import numpy.linalg as LA
 
 N = 11
 K = 1
 
-task = [[3.2, 2.12], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
-task = [np.array(x) for x in task]
+# task = [[3,3], [4,4]]
+# task = [np.array(x) for x in task]
+
+task = []
+for i in range(5):
+    center = []
+    for j in range(10):
+        center.append([3.5 + 1 * i, 3.25 + 0.5 * j])
+    if i%2==0:
+        task.extend(center)
+    else:
+        center.reverse()
+        task.extend(center)
+task = np.array(task)
 
 def active_team_move(robot_list, moving_robot_index, target):
 
@@ -91,7 +104,6 @@ def scheduling_for_single_point(robot_list, point, leader_index=False):
     robots = robot_list
     if leader_index:
         robots = leader_move(robots, leader_index, point)
-        
     else:
         robots, leader_index = leader_election(robots, point)
         if (robots[leader_index].pre_role == 'leaf'):
@@ -386,4 +398,23 @@ def scheduling_for_single_task(robot_list, target):
         #     for x in robots:
         #         if (x.role == 'leader'):
         #             x.role_update('leaf')
+    return robots
+
+
+def leader_coverage(robot_list, target):
+
+    robots = robot_list
+    robots, leader_index = leader_election(robots, target[0])
+    moving_robot_index = [leader_index]
+    for point in target:
+
+        robots = leader_move(robots, leader_index, point)
+        while (LA.norm(robots[leader_index].location - point) >= 0.05):
+            robots, recruit_index = recruit_election(robots)
+            print("recruit_index:")
+            print(recruit_index)
+            moving_robot_index.insert(0, recruit_index)
+            robots = active_team_move(robots, moving_robot_index, point)
+
+
     return robots
