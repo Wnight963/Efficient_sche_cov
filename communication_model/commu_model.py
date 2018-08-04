@@ -59,15 +59,27 @@ def optimal_routing(x):
     h = matrix(h)
 
     solvers.options['show_progress'] = False
-    solvers.options['maxiters'] = 1000
     solvers.options['maxiters'] = 100
-    sol=solvers.qp(Q, p, G, h)
-    T = np.array(sol['x'])
-    T = T.reshape([N, N+K], order="F")
-    if(sol['status']=='optimal'):
-        return sol, T
-    else:
-        return sol, False
+    # solvers.options['reltol'] = 1e-2
+    try:
+        sol=solvers.qp(Q, p, G, h)
+        T = np.array(sol['x'])
+        T = T.reshape([N, N + K], order="F")
+        if (sol['status'] == 'optimal'):
+            return sol, T
+        else:
+            return sol, False
+    except ValueError as err:
+        print("Exception", err)
+        res = {}
+        res['status'] = 'nonoptimal'
+        return res, False
+    # T = np.array(sol['x'])
+    # T = T.reshape([N, N+K], order="F")
+    # if(sol['status']=='optimal'):
+    #     return sol, T
+    # else:
+    #     return sol, False
 
 
 def transmission(x, T):

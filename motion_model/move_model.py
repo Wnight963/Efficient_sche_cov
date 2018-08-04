@@ -1,6 +1,6 @@
 import sys
 sys.path.append(r'../communication_model')
-
+sys.path.append(r'..')
 from robot_class import location_extraction
 from robot_class import routing_strategy_extraction
 from robot_class import single_node_move
@@ -46,8 +46,8 @@ def active_team_move(robot_list, moving_robot_index, target):
     # be sure to use .copy
     team_length = len(moving_robot_index)
     routing_strategy = routing_strategy_extraction(robot_list)
-    print('moving robot index:')
-    print(moving_robot_index)
+    # print('moving robot index:')
+    # print(moving_robot_index)
     while(1):
         for i in range(team_length):
             if(i<team_length-1):
@@ -77,6 +77,7 @@ def active_team_move(robot_list, moving_robot_index, target):
             # calculate routing_strategy for current locations
             # if solvable(find optimal solution), record these locations to robots
             # and update routing strategies.
+
             if(res['status']=='optimal'):
                 # print('this is optimal')
                 for i, x in enumerate(robot_list):
@@ -90,7 +91,7 @@ def active_team_move(robot_list, moving_robot_index, target):
                 break
             location = new_location.copy()
         routing_graph(location, transmission(location, routing_strategy), N, K)
-    print("ACTIVE MOVING TERMINATED!")
+    # print("ACTIVE MOVING TERMINATED!")
     return robot_list
 
 
@@ -403,17 +404,22 @@ def scheduling_for_single_task(robot_list, target):
 
 def leader_coverage(robot_list, target):
 
+    from robot_class import robot_network_extraction
+
     robots = robot_list
     robots, leader_index = leader_election(robots, target[0])
     moving_robot_index = [leader_index]
     for point in target:
-
         robots = leader_move(robots, leader_index, point)
         while (LA.norm(robots[leader_index].location - point) >= 0.05):
             robots, recruit_index = recruit_election(robots)
-            print("recruit_index:")
-            print(recruit_index)
-            moving_robot_index.insert(0, recruit_index)
+
+            G = robot_network_extraction(robots)
+            shortest_path = nx.shortest_path(G, source=N + K - 1, target=leader_index)
+            shortest_path[0] = recruit_index
+            moving_robot_index = shortest_path
+            # moving_robot_index.insert(0, recruit_index)
+
             robots = active_team_move(robots, moving_robot_index, point)
 
 
