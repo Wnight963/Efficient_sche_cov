@@ -17,7 +17,7 @@ for x in robots:
     print(x.number, x.role, x.pre_role, x.location)
 robots[-1].pre_role = 'AP'
 # robots
-task = [[3, 2.0], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
+task = [[3.2, 2.12], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
 task = [np.array(x) for x in task]
 task_completion_progress = [0 for x in task]
 # task

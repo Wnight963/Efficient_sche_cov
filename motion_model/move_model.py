@@ -17,7 +17,7 @@ import numpy.linalg as LA
 N = 11
 K = 1
 
-task = [[3, 2.0], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
+task = [[3.2, 2.12], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
 task = [np.array(x) for x in task]
 
 def active_team_move(robot_list, moving_robot_index, target):
@@ -83,143 +83,307 @@ def active_team_move(robot_list, moving_robot_index, target):
 
 
 
-def scheduling_for_single_task(robot_list, target):
+def scheduling_for_single_point(robot_list, point, leader_index=False):
     
+    'this function simulates the movement of an existing robot network when given a'
+    'new point'
+
+    robots = robot_list
+    if leader_index:
+        robots = leader_move(robots, leader_index, point)
+        
+    else:
+        robots, leader_index = leader_election(robots, point)
+        if (robots[leader_index].pre_role == 'leaf'):
+            robots, recruit_index = recruit_election(robots)
+            secondary_leader_team_index = secondary_leader_team_construction(
+                robots, recruit_index, leader_index)
+            print(secondary_leader_team_index)
+            ########### once the leader is elected and it's previous role is a leaf node
+            ########### a recruit election is immediately induced to release the leader from
+            ########### its previous location
+
+            for i in range(len(secondary_leader_team_index) - 1):
+                if(robots[secondary_leader_team_index[i + 1][0]].role=='leaf'
+                or robots[secondary_leader_team_index[i + 1][0]].role=='leader'):
+                    current_location = robots[secondary_leader_team_index[i + 1][0]].location
+                    distance_to_current_location = [LA.norm(x-current_location) for x in task]
+                    destination = task[distance_to_current_location.index(min
+                                                                          (distance_to_current_location))]
+                else:
+                    destination = robots[secondary_leader_team_index[i + 1][0]].location
+                robots = active_team_move(robots, secondary_leader_team_index[i],destination)
+                #######
+                ####### if the subgroup's destination is a leaf node, we just change the destination
+                ####### to the nearest task
+                if (i < len(secondary_leader_team_index) - 2):
+                    tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+                else:
+                    tmp_role = robots[leader_index].pre_role
+                robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+
+            ###########
+            primary_leader_team = [leader_index]
+            ########## primary team now has only one member leader
+            robots = active_team_move(robots, primary_leader_team, point)
+            ########## primary team moves and gets trapped in local stationary point
+            while (LA.norm(robots[leader_index].location - point) >= 0.2):
+                robots, recruit_index = recruit_election(robots)
+                secondary_leader_team_index = secondary_leader_team_construction(
+                    robots, recruit_index, primary_leader_team[0])
+                print(secondary_leader_team_index)
+                for i in range(len(secondary_leader_team_index) - 1):
+                    if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'
+                            or robots[secondary_leader_team_index[i + 1][0]].role == 'leader'):
+                        current_location = robots[secondary_leader_team_index[i + 1][0]].location
+                        distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                        destination = task[distance_to_current_location.index(min
+                                                                              (distance_to_current_location))]
+                    else:
+                        destination = robots[secondary_leader_team_index[i + 1][0]].location
+                    robots = active_team_move(robots, secondary_leader_team_index[i], destination)
+                    if (i < len(secondary_leader_team_index) - 2):
+                        tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+                    else:
+                        tmp_role = robots[leader_index].pre_role
+                    robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+                primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
+                robots[primary_leader_team[0]].role_update("node")
+                robots = active_team_move(robots, primary_leader_team, point)
+            if (LA.norm(robots[leader_index].location - point) < 0.2):
+                print("task completed!")
+            # for x in robots:
+            #     if (x.role == 'leader'):
+            #         x.role_update('leaf')
+        elif (robots[leader_index].pre_role == 'node' or robots[leader_index].pre_role == 'junction'):
+            robots, recruit_index = recruit_election(robots)
+            secondary_leader_team_index = secondary_leader_team_construction(
+                robots, recruit_index, leader_index)
+            print(secondary_leader_team_index)
+            ########### once the leader is elected and it's previous role is a leaf node
+            ########### a recruit election is immediately induced to release the leader from
+            ########### its previous location
+            for i in range(len(secondary_leader_team_index) - 1):
+                if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'):
+                    current_location = robots[secondary_leader_team_index[i + 1][0]].location
+                    distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                    destination = task[distance_to_current_location.index(min
+                                                                          (distance_to_current_location))]
+                else:
+                    destination = robots[secondary_leader_team_index[i + 1][0]].location
+                robots = active_team_move(robots, secondary_leader_team_index[i],
+                                          destination)
+                if (i < len(secondary_leader_team_index) - 2):
+                    tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+                else:
+                    tmp_role = 'junction'
+                robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+
+            ###########
+            primary_leader_team = [leader_index]
+            ########## primary team now has only one member leader
+            robots = active_team_move(robots, primary_leader_team, point)
+            ########## primary team moves and gets trapped in local stationary point
+            while (LA.norm(robots[leader_index].location - point) >= 0.2):
+                robots, recruit_index = recruit_election(robots)
+                secondary_leader_team_index = secondary_leader_team_construction(
+                    robots, recruit_index, primary_leader_team[0])
+                print(secondary_leader_team_index)
+                for i in range(len(secondary_leader_team_index) - 1):
+                    if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'
+                            or robots[secondary_leader_team_index[i + 1][0]].role == 'leader'):
+                        current_location = robots[secondary_leader_team_index[i + 1][0]].location
+                        distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                        destination = task[distance_to_current_location.index(min
+                                                                              (distance_to_current_location))]
+                    else:
+                        destination = robots[secondary_leader_team_index[i + 1][0]].location
+                    robots = active_team_move(robots, secondary_leader_team_index[i], destination)
+                    if (i < len(secondary_leader_team_index) - 2):
+                        tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+                    else:
+                        tmp_role = robots[leader_index].pre_role
+                    robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+                primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
+                robots[primary_leader_team[0]].role_update("node")
+                robots = active_team_move(robots, primary_leader_team, point)
+            if (LA.norm(robots[leader_index].location - point) < 0.2):
+                print("task completed!")
+            # for x in robots:
+            #     if (x.role == 'leader'):
+            #         x.role_update('leaf')
+        else:
+            # don't bother to use primary leader team and secondary leader team
+            robots = leader_move(robots, leader_index, point)
+            moving_robot_index = [leader_index]
+            while (LA.norm(robots[leader_index].location - point) >= 0.2):
+                robots, recruit_index = recruit_election(robots)
+                print("recruit_index:")
+                print(recruit_index)
+                moving_robot_index.insert(0, recruit_index)
+                robots = active_team_move(robots, moving_robot_index, point)
+            # for x in robots:
+            #     if (x.role == 'leader'):
+            #         x.role_update('leaf')
+    return robots
+
+
+def scheduling_for_single_task(robot_list, target):
     'this function simulates the movement of an existing robot network when given a'
     'new task'
 
-    robots = robot_list
-    robots, leader_index = leader_election(robots, target)
 
-    if (robots[leader_index].pre_role == 'leaf'):
-        robots, recruit_index = recruit_election(robots)
-        secondary_leader_team_index = secondary_leader_team_construction(
-            robots, recruit_index, leader_index)
-        print(secondary_leader_team_index)
-        ########### once the leader is elected and it's previous role is a leaf node
-        ########### a recruit election is immediately induced to release the leader from
-        ########### its previous location
+    if (type(target[0]) == list):
+        # if target includes several places to visit
+        robots = robot_list
+        robots, leader_index = leader_election(robots, target[0])
+        for i in range(len(target)):
+            robots = scheduling_for_single_point(robots, target[i], leader_index)
+            if i==len(target)-1:
+                for x in robots:
+                    if (x.role == 'leader'):
+                        x.role_update('leaf')
 
-        for i in range(len(secondary_leader_team_index) - 1):
-            if(robots[secondary_leader_team_index[i + 1][0]].role=='leaf'
-            or robots[secondary_leader_team_index[i + 1][0]].role=='leader'):
-                current_location = robots[secondary_leader_team_index[i + 1][0]].location
-                distance_to_current_location = [LA.norm(x-current_location) for x in task]
-                destination = task[distance_to_current_location.index(min
-                                                                      (distance_to_current_location))]
-            else:
-                destination = robots[secondary_leader_team_index[i + 1][0]].location
-            robots = active_team_move(robots, secondary_leader_team_index[i],destination)
-            #######
-            ####### if the subgroup's destination is a leaf node, we just change the destination
-            ####### to the nearest task
-            if (i < len(secondary_leader_team_index) - 2):
-                tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
-            else:
-                tmp_role = robots[leader_index].pre_role
-            robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
 
-        ###########
-        primary_leader_team = [leader_index]
-        ########## primary team now has only one member leader
-        robots = active_team_move(robots, primary_leader_team, target)
-        ########## primary team moves and gets trapped in local stationary point
-        while (LA.norm(robots[leader_index].location - target) >= 0.2):
-            robots, recruit_index = recruit_election(robots)
-            secondary_leader_team_index = secondary_leader_team_construction(
-                robots, recruit_index, primary_leader_team[0])
-            print(secondary_leader_team_index)
-            for i in range(len(secondary_leader_team_index) - 1):
-                if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'
-                        or robots[secondary_leader_team_index[i + 1][0]].role == 'leader'):
-                    current_location = robots[secondary_leader_team_index[i + 1][0]].location
-                    distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                    destination = task[distance_to_current_location.index(min
-                                                                          (distance_to_current_location))]
-                else:
-                    destination = robots[secondary_leader_team_index[i + 1][0]].location
-                robots = active_team_move(robots, secondary_leader_team_index[i], destination)
-                if (i < len(secondary_leader_team_index) - 2):
-                    tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
-                else:
-                    tmp_role = robots[leader_index].pre_role
-                robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
-            primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
-            robots[primary_leader_team[0]].role_update("node")
-            robots = active_team_move(robots, primary_leader_team, target)
-        if (LA.norm(robots[leader_index].location - target) < 0.2):
-            print("task completed!")
-        for x in robots:
-            if (x.role == 'leader'):
-                x.role_update('leaf')
-    elif (robots[leader_index].pre_role == 'node' or robots[leader_index].pre_role == 'junction'):
-        robots, recruit_index = recruit_election(robots)
-        secondary_leader_team_index = secondary_leader_team_construction(
-            robots, recruit_index, leader_index)
-        print(secondary_leader_team_index)
-        ########### once the leader is elected and it's previous role is a leaf node
-        ########### a recruit election is immediately induced to release the leader from
-        ########### its previous location
-        for i in range(len(secondary_leader_team_index) - 1):
-            if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'):
-                current_location = robots[secondary_leader_team_index[i + 1][0]].location
-                distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                destination = task[distance_to_current_location.index(min
-                                                                      (distance_to_current_location))]
-            else:
-                destination = robots[secondary_leader_team_index[i + 1][0]].location
-            robots = active_team_move(robots, secondary_leader_team_index[i],
-                                      destination)
-            if (i < len(secondary_leader_team_index) - 2):
-                tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
-            else:
-                tmp_role = 'junction'
-            robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
 
-        ###########
-        primary_leader_team = [leader_index]
-        ########## primary team now has only one member leader
-        robots = active_team_move(robots, primary_leader_team, target)
-        ########## primary team moves and gets trapped in local stationary point
-        while (LA.norm(robots[leader_index].location - target) >= 0.2):
-            robots, recruit_index = recruit_election(robots)
-            secondary_leader_team_index = secondary_leader_team_construction(
-                robots, recruit_index, primary_leader_team[0])
-            print(secondary_leader_team_index)
-            for i in range(len(secondary_leader_team_index) - 1):
-                if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'
-                        or robots[secondary_leader_team_index[i + 1][0]].role == 'leader'):
-                    current_location = robots[secondary_leader_team_index[i + 1][0]].location
-                    distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                    destination = task[distance_to_current_location.index(min
-                                                                          (distance_to_current_location))]
-                else:
-                    destination = robots[secondary_leader_team_index[i + 1][0]].location
-                robots = active_team_move(robots, secondary_leader_team_index[i], destination)
-                if (i < len(secondary_leader_team_index) - 2):
-                    tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
-                else:
-                    tmp_role = robots[leader_index].pre_role
-                robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
-            primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
-            robots[primary_leader_team[0]].role_update("node")
-            robots = active_team_move(robots, primary_leader_team, target)
-        if (LA.norm(robots[leader_index].location - target) < 0.2):
-            print("task completed!")
-        for x in robots:
-            if (x.role == 'leader'):
-                x.role_update('leaf')
+
     else:
-        # don't bother to use primary leader team and secondary leader team
-        robots = leader_move(robots, leader_index, target)
-        moving_robot_index = [leader_index]
-        while (LA.norm(robots[leader_index].location - target) >= 0.2):
-            robots, recruit_index = recruit_election(robots)
-            print("recruit_index:")
-            print(recruit_index)
-            moving_robot_index.insert(0, recruit_index)
-            robots = active_team_move(robots, moving_robot_index, target)
+        # if target includes only one place
+        robots = scheduling_for_single_point(robot_list, target)
         for x in robots:
             if (x.role == 'leader'):
                 x.role_update('leaf')
+        # robots = robot_list
+        # robots, leader_index = leader_election(robots, target)
+        # if (robots[leader_index].pre_role == 'leaf'):
+        #     robots, recruit_index = recruit_election(robots)
+        #     secondary_leader_team_index = secondary_leader_team_construction(
+        #         robots, recruit_index, leader_index)
+        #     print(secondary_leader_team_index)
+        #     ########### once the leader is elected and it's previous role is a leaf node
+        #     ########### a recruit election is immediately induced to release the leader from
+        #     ########### its previous location
+        #
+        #     for i in range(len(secondary_leader_team_index) - 1):
+        #         if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'
+        #                 or robots[secondary_leader_team_index[i + 1][0]].role == 'leader'):
+        #             current_location = robots[secondary_leader_team_index[i + 1][0]].location
+        #             distance_to_current_location = [LA.norm(x - current_location) for x in task]
+        #             destination = task[distance_to_current_location.index(min
+        #                                                                   (distance_to_current_location))]
+        #         else:
+        #             destination = robots[secondary_leader_team_index[i + 1][0]].location
+        #         robots = active_team_move(robots, secondary_leader_team_index[i], destination)
+        #         #######
+        #         ####### if the subgroup's destination is a leaf node, we just change the destination
+        #         ####### to the nearest task
+        #         if (i < len(secondary_leader_team_index) - 2):
+        #             tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+        #         else:
+        #             tmp_role = robots[leader_index].pre_role
+        #         robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+        #
+        #     ###########
+        #     primary_leader_team = [leader_index]
+        #     ########## primary team now has only one member leader
+        #     robots = active_team_move(robots, primary_leader_team, target)
+        #     ########## primary team moves and gets trapped in local stationary point
+        #     while (LA.norm(robots[leader_index].location - target) >= 0.2):
+        #         robots, recruit_index = recruit_election(robots)
+        #         secondary_leader_team_index = secondary_leader_team_construction(
+        #             robots, recruit_index, primary_leader_team[0])
+        #         print(secondary_leader_team_index)
+        #         for i in range(len(secondary_leader_team_index) - 1):
+        #             if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'
+        #                     or robots[secondary_leader_team_index[i + 1][0]].role == 'leader'):
+        #                 current_location = robots[secondary_leader_team_index[i + 1][0]].location
+        #                 distance_to_current_location = [LA.norm(x - current_location) for x in task]
+        #                 destination = task[distance_to_current_location.index(min
+        #                                                                       (distance_to_current_location))]
+        #             else:
+        #                 destination = robots[secondary_leader_team_index[i + 1][0]].location
+        #             robots = active_team_move(robots, secondary_leader_team_index[i], destination)
+        #             if (i < len(secondary_leader_team_index) - 2):
+        #                 tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+        #             else:
+        #                 tmp_role = robots[leader_index].pre_role
+        #             robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+        #         primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
+        #         robots[primary_leader_team[0]].role_update("node")
+        #         robots = active_team_move(robots, primary_leader_team, target)
+        #     if (LA.norm(robots[leader_index].location - target) < 0.2):
+        #         print("task completed!")
+        #     for x in robots:
+        #         if (x.role == 'leader'):
+        #             x.role_update('leaf')
+        # elif (robots[leader_index].pre_role == 'node' or robots[leader_index].pre_role == 'junction'):
+        #     robots, recruit_index = recruit_election(robots)
+        #     secondary_leader_team_index = secondary_leader_team_construction(
+        #         robots, recruit_index, leader_index)
+        #     print(secondary_leader_team_index)
+        #     ########### once the leader is elected and it's previous role is a leaf node
+        #     ########### a recruit election is immediately induced to release the leader from
+        #     ########### its previous location
+        #     for i in range(len(secondary_leader_team_index) - 1):
+        #         if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'):
+        #             current_location = robots[secondary_leader_team_index[i + 1][0]].location
+        #             distance_to_current_location = [LA.norm(x - current_location) for x in task]
+        #             destination = task[distance_to_current_location.index(min
+        #                                                                   (distance_to_current_location))]
+        #         else:
+        #             destination = robots[secondary_leader_team_index[i + 1][0]].location
+        #         robots = active_team_move(robots, secondary_leader_team_index[i],
+        #                                   destination)
+        #         if (i < len(secondary_leader_team_index) - 2):
+        #             tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+        #         else:
+        #             tmp_role = 'junction'
+        #         robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+        #
+        #     ###########
+        #     primary_leader_team = [leader_index]
+        #     ########## primary team now has only one member leader
+        #     robots = active_team_move(robots, primary_leader_team, target)
+        #     ########## primary team moves and gets trapped in local stationary point
+        #     while (LA.norm(robots[leader_index].location - target) >= 0.2):
+        #         robots, recruit_index = recruit_election(robots)
+        #         secondary_leader_team_index = secondary_leader_team_construction(
+        #             robots, recruit_index, primary_leader_team[0])
+        #         print(secondary_leader_team_index)
+        #         for i in range(len(secondary_leader_team_index) - 1):
+        #             if (robots[secondary_leader_team_index[i + 1][0]].role == 'leaf'
+        #                     or robots[secondary_leader_team_index[i + 1][0]].role == 'leader'):
+        #                 current_location = robots[secondary_leader_team_index[i + 1][0]].location
+        #                 distance_to_current_location = [LA.norm(x - current_location) for x in task]
+        #                 destination = task[distance_to_current_location.index(min
+        #                                                                       (distance_to_current_location))]
+        #             else:
+        #                 destination = robots[secondary_leader_team_index[i + 1][0]].location
+        #             robots = active_team_move(robots, secondary_leader_team_index[i], destination)
+        #             if (i < len(secondary_leader_team_index) - 2):
+        #                 tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
+        #             else:
+        #                 tmp_role = robots[leader_index].pre_role
+        #             robots[secondary_leader_team_index[i][-1]].role_update(tmp_role)
+        #         primary_leader_team.insert(0, secondary_leader_team_index[-1][0])
+        #         robots[primary_leader_team[0]].role_update("node")
+        #         robots = active_team_move(robots, primary_leader_team, target)
+        #     if (LA.norm(robots[leader_index].location - target) < 0.2):
+        #         print("task completed!")
+        #     for x in robots:
+        #         if (x.role == 'leader'):
+        #             x.role_update('leaf')
+        # else:
+        #     # don't bother to use primary leader team and secondary leader team
+        #     robots = leader_move(robots, leader_index, target)
+        #     moving_robot_index = [leader_index]
+        #     while (LA.norm(robots[leader_index].location - target) >= 0.2):
+        #         robots, recruit_index = recruit_election(robots)
+        #         print("recruit_index:")
+        #         print(recruit_index)
+        #         moving_robot_index.insert(0, recruit_index)
+        #         robots = active_team_move(robots, moving_robot_index, target)
+        #     for x in robots:
+        #         if (x.role == 'leader'):
+        #             x.role_update('leaf')
     return robots

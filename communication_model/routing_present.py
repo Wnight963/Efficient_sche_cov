@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import datetime
-# from matplotlib.patches import Circle
+from matplotlib.patches import Circle
 from matplotlib.patches import Rectangle
 
 fig = plt.figure("routing")
@@ -14,12 +14,16 @@ f.close()
 
 global deteced_user
 deteced_user = []
-
+# global variable, all the detected users
 
 
 def if_is_detected(x, user):
+
+    'determine if the user equipment is detected by UAVS'
+    'x: locations of UAV, user: location of user'
+
     distance = x - user
-    photo_range = np.array([0.5, 0.25])
+    photo_range = np.array([0.2, 0.12])
     dectected = [list(abs(n) < photo_range) for n in distance]
     res = [True, True] in dectected
     return res
@@ -33,6 +37,7 @@ def routing_graph(x, transmission, N, K):
     ax.cla()
     # ax.grid(True, linestyle="-.", color="r", linewidth="3")
     ax.axis([2.8, 5.2, 1.8, 4.2])
+    ax.grid(True)
     ax.scatter(x[:, 0], x[:, 1])
 
     global deteced_user
@@ -46,12 +51,13 @@ def routing_graph(x, transmission, N, K):
 
 
     for i in range(len(x)):
-        # cir = Circle(xy=(x[i, 0], x[i, 1]), radius=0.5, alpha=0.5)
-        xy = (x[i, 0] - 0.5, x[i, 1] - 0.25)
-        rec = Rectangle(xy, height=0.5, width=1, fill=False)
-        ax.add_patch(rec)
+        cir = Circle(xy=(x[i, 0], x[i, 1]), radius=0.5, alpha=0.5)
+        ax.add_patch(cir)
+        # xy = (x[i, 0] - 0.2, x[i, 1] - 0.12)
+        # rec = Rectangle(xy, height=0.24, width=0.4, fill=False)
+        # ax.add_patch(rec)
         # draw a circle around UAVs
-    task = [[3, 2.0], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
+    task = [[3.2, 2.12], [4, 2.5], [4, 3.5], [3, 4], [5, 2], [5, 4]]
     task = np.array(task)
     ax.scatter(task[:, 0], task[:, 1], marker='x')
     n = range(N + K)
