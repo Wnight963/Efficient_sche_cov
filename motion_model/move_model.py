@@ -297,7 +297,7 @@ def leader_coverage(robot_list, target):
             shortest_path[0] = recruit_index
             moving_robot_index = shortest_path
             # moving_robot_index.insert(0, recruit_index)
-
+            
             robots = active_team_move(robots, moving_robot_index, point)
 
 

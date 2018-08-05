@@ -32,23 +32,23 @@ robots[-1].pre_role = 'AP'
 #         center.reverse()
 #         task.extend(center)
 
-# task = []
-# for i in range(1):
-#     center = []
-#     for j in range(2):
-#         center.append([3.5+1*i, 3.25+0.5*12*j])
-#     if i%2==0:
-#         task.extend(center)
-#     else:
-#         center.reverse()
-#         task.extend(center)
-task = [[3.5 ,3.25], [3.5 ,8.25]]
+task = []
+for i in range(5):
+    center = []
+    for j in range(10):
+        center.append([3.5+1*i, 3.25+0.5*j])
+    if i%2==0:
+        task.extend(center)
+    else:
+        center.reverse()
+        task.extend(center)
+# task = [[3.5 ,3.25], [3.5 ,8.25]]
 task = np.array(task)
 from move_model import leader_coverage
-# robots = leader_coverage(robots, task)
-
-for i in range(len(task)):
-    robots = scheduling_for_single_task(robots, task[i])
+robots = leader_coverage(robots, task)
+#
+# for i in range(len(task)):
+#     robots = scheduling_for_single_task(robots, task[i])
 #
 print('*******************************************************')
 for x in robots:
