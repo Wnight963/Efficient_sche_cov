@@ -243,13 +243,17 @@ def subgroup_index_extraction(original_list, word):
     b = original_list
     # print(b)
     c = [i for i, x in enumerate(b) if x in word]
-    sum = [list(range(c[0]))]
-    for i in range(len(c)):
-        if (i == len(c) - 1):
-            sum.append(list(range(c[i], len(original_list))))
-        else:
-            sum.append(list(range(c[i],c[i + 1])))
-    return sum
+    # it is possible that no one in original_list is in word, at that time c=[]
+    if len(c):
+        sum = [list(range(c[0]))]
+        for i in range(len(c)):
+            if (i == len(c) - 1):
+                sum.append(list(range(c[i], len(original_list))))
+            else:
+                sum.append(list(range(c[i],c[i + 1])))
+        return sum
+    else:
+        return [range(len(b))]
 
 
 
@@ -259,12 +263,24 @@ def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_in
     'target node: robot who induces recruit'
 
     G = robot_network_extraction(robots)
+
+    Important_nodes = [i for i in range(N) if robots[i].role=='juction']
+    for nod in Important_nodes:
+        neighbor = nx.all_neighbors(G, nod)
+        redundant_edge = [(i,j) for i in neighbor for j in neighbor]
+        G.remove_edges_from(redundant_edge)
+
     shortest_path = nx.shortest_path(G, source=N+K-1, target=recruit_inducer_index)
     # find the shortest path from AP to robot who induces recruit
     shortest_path[0] = recruit_index
+    shortest_path.pop()
+    if len(shortest_path)>=6:
+        print('shortest path')
+        print(shortest_path)
     # then replace the AP with previously recruit robot. In this way, the fault that there may
     # exist no path from recruit to recruit_inducer is avoided.
     roles_in_2nd_leader_team = [robots[x].role for x in shortest_path]
+    # print(roles_in_2nd_leader_team)
     # if(after_leader_election==True):
     #     break_role = ['junction', 'leader', 'leaf']
     # else:

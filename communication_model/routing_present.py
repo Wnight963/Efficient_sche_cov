@@ -91,7 +91,7 @@ def routing_graph(x, transmission, N, K):
                 # thickness denotes transmmision rate
 
     plt.ion()
-    plt.pause(0.03)
+    plt.pause(0.01)
     # plt.close()
     # plt.show()
 
