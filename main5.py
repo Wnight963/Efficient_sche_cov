@@ -34,7 +34,7 @@ robots[-1].pre_role = 'AP'
 #         task.extend(center)
 
 task = []
-for i in range(3):
+for i in range(5):
     center = []
     for j in range(10):
         center.append([3.5+1*i, 3.25+0.5*j])
@@ -52,9 +52,9 @@ robots = leader_coverage(robots, task)
 #     robots = scheduling_for_single_task(robots, task[i])
 #
 print('*******************************************************')
-for x in robots:
-    print(x.number, x.role, x.location)
-    # name = 'robots_after_' + str(i+1) + 'st_task.pckl'
-    # f = open(name, 'wb')
-    # pickle.dump(robots, f)
-    # f.close()
+
+
+name = 'robots_after_coverage_.pckl'
+f = open(name, 'wb')
+pickle.dump(robots, f)
+f.close()

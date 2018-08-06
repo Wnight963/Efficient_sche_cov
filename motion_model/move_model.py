@@ -9,6 +9,7 @@ from robot_class import leader_move
 from robot_class import leader_election
 from robot_class import recruit_election
 from robot_class import secondary_leader_team_construction
+from robot_class import subgroup_index_extraction
 from commu_model import optimal_routing
 from commu_model import transmission
 from routing_present import routing_graph
@@ -91,7 +92,7 @@ def active_team_move(robot_list, moving_robot_index, target):
             #     print('BERAK2')
                 break
             location = new_location.copy()
-        # routing_graph(location, transmission(location, routing_strategy), N, K)
+        routing_graph(location, transmission(location, routing_strategy), N, K)
     # print("ACTIVE MOVING TERMINATED!")
     return robot_list
 
@@ -301,8 +302,8 @@ def leader_coverage(robot_list, target):
             H = G.subgraph(worker)
             H = nx.relabel_nodes(H, {N+K-1: recruit_index})
 
-            nx.draw(H, with_labels=True)
-            plt.show()
+            # nx.draw(H, with_labels=True)
+            # plt.show()
 
             # replace AP by the recruit
             for nod in H.out_degree:
@@ -310,20 +311,31 @@ def leader_coverage(robot_list, target):
                 out_deg = nod[1]
                 if robots[index].role=='node' and out_deg>2:
                     robots[index].role_update('junction')
-            # identify all junction node
-            for x in robots:
-                if x.role=='junction':
-                    print("%d is a junction node!!!! out degree is %d" % (x.number, 2))
+                    print("%d is a junction node!!!! out degree is %d" % (index, out_deg))
                     print('successors are:')
-                    print([y for y in H.successors(x.number)])
+                    print([y for y in H.successors(index)])
+            # identify all junction node
+
+
+
+
             shortest_path = nx.shortest_path(H, source=recruit_index, target=leader_index)
+            roles_in_2nd_leader_team = [robots[x].role for x in shortest_path]
+            break_role = ['junction']
+            subgroup_of_2nd_leader_team_index = subgroup_index_extraction(roles_in_2nd_leader_team, break_role)
+            moving_robot_index = [shortest_path[x[0]:(x[-1] + 1)] for x in subgroup_of_2nd_leader_team_index]
             # shortest path from AP to leader
-
-
-            moving_robot_index = shortest_path
             print('moving robot index:')
             print(moving_robot_index)
-            robots = active_team_move(robots, moving_robot_index, point)
+
+
+            for i in range(len(moving_robot_index)):
+                if i<len(moving_robot_index)-1:
+                    target = robots[moving_robot_index[i+1][0]].location
+                else:
+                    target = point
+                robots = active_team_move(robots, moving_robot_index[i], target)
+
             # worker = [x for x in worker if LA.norm(robots[x].location) > 0.4]
             for nod in H.out_degree:
                 index = nod[0]

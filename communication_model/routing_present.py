@@ -36,13 +36,13 @@ def routing_graph(x, transmission, N, K):
 
     ax.cla()
     # ax.grid(True, linestyle="-.", color="r", linewidth="3")
-    ax.axis([0, 8, 0, 8])
-    # major_ticks = np.arange(3, 8, 1)
-    # minor_ticks = np.arange(3, 8, 0.5)
-    # ax.set_xticks(major_ticks)
-    # ax.set_yticks(major_ticks)
-    # ax.set_yticks(minor_ticks)
-    # ax.grid(which='both')
+    ax.axis([3, 8, 3, 8])
+    major_ticks = np.arange(3, 8, 1)
+    minor_ticks = np.arange(3, 8, 0.5)
+    ax.set_xticks(major_ticks)
+    ax.set_yticks(major_ticks)
+    ax.set_yticks(minor_ticks)
+    ax.grid(which='both')
     ax.scatter(x[:, 0], x[:, 1])
 
     global deteced_user
@@ -91,7 +91,7 @@ def routing_graph(x, transmission, N, K):
                 # thickness denotes transmmision rate
 
     plt.ion()
-    plt.pause(0.03)
+    plt.pause(0.01)
     # plt.close()
     # plt.show()
 

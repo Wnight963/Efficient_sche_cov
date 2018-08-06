@@ -21,5 +21,5 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
-a = (1==1) and (2==3)
+a = [i for i in range(9) if i%2==0 and i%3==0]
 print(a)
