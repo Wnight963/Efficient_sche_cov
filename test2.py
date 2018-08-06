@@ -22,11 +22,10 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-G = nx.DiGraph()
-G.add_nodes_from([1,2,3])
-G.add_edges_from([(1,2), (1,3)])
-x = [i for i in nx.all_neighbors(G,1)]
-G.remove_edges_from([(2,3)])
-
-nx.draw(G)
+G = nx.Graph()
+G.add_path([0,1,2,3])
+H = G.subgraph([0,1,2])
+print(H.degree)
+nx.draw(H)
 plt.show()
+

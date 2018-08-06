@@ -3,6 +3,7 @@ sys.path.append(r'../communication_model')
 sys.path.append(r'..')
 from robot_class import location_extraction
 from robot_class import routing_strategy_extraction
+from robot_class import robot_network_extraction
 from robot_class import single_node_move
 from robot_class import leader_move
 from robot_class import leader_election
@@ -11,6 +12,7 @@ from robot_class import secondary_leader_team_construction
 from commu_model import optimal_routing
 from commu_model import transmission
 from routing_present import routing_graph
+
 import numpy as np
 import networkx as nx
 import numpy.linalg as LA
@@ -283,22 +285,47 @@ def scheduling_for_single_task(robot_list, target):
 
 def leader_coverage(robot_list, target):
 
-    from robot_class import robot_network_extraction
+
 
     robots = robot_list
     robots, leader_index = leader_election(robots, target[0])
+    worker = [leader_index]
     for point in target:
         robots = leader_move(robots, leader_index, point)
+
         while (LA.norm(robots[leader_index].location - point) >= 0.05):
             robots, recruit_index = recruit_election(robots)
+            print('recruit:')
+            print(recruit_index)
+            worker.append(recruit_index)
 
             G = robot_network_extraction(robots)
+            H = G.subgraph(worker)
+
+            print('H nodes:')
+            for x in H.nodes:
+                print(x)
+            for x in H.degree:
+                if x[1]>=3 and x[0]<N:
+                    robots[x[0]].role_update('junction')
+                else:
+                    robots[x[0]].role_update('node')
+            for x in robots:
+                if x.role=='junction':
+                    print('%d is a junction' % x.number)
+            # secondary_leader_team_index = secondary_leader_team_construction(
+            #     robots, recruit_index, leader_index)
+
             shortest_path = nx.shortest_path(G, source=N + K - 1, target=leader_index)
             shortest_path[0] = recruit_index
             moving_robot_index = shortest_path
-            # moving_robot_index.insert(0, recruit_index)
-            
+            print('moving robot index:')
+            print(moving_robot_index)
+            old_location = location_extraction(robots)
             robots = active_team_move(robots, moving_robot_index, point)
+            worker = [x for x in worker if LA.norm(robots[x].location) > 0.4]
+            # if max(LA.norm((location_extraction(robots) - old_location), axis=1))<0.05:
+
 
 
     return robots

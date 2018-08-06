@@ -274,9 +274,7 @@ def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_in
     # find the shortest path from AP to robot who induces recruit
     shortest_path[0] = recruit_index
     shortest_path.pop()
-    if len(shortest_path)>=6:
-        print('shortest path')
-        print(shortest_path)
+
     # then replace the AP with previously recruit robot. In this way, the fault that there may
     # exist no path from recruit to recruit_inducer is avoided.
     roles_in_2nd_leader_team = [robots[x].role for x in shortest_path]

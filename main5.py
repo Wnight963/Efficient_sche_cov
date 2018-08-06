@@ -14,6 +14,7 @@ f.close()
 
 for x in robots:
     x.pre_role = "redundant_node"
+    x.location /= 2
     print(x.number, x.role, x.pre_role, x.location)
 robots[-1].pre_role = 'AP'
 # robots
@@ -42,7 +43,7 @@ for i in range(5):
     else:
         center.reverse()
         task.extend(center)
-# task = [[3.5 ,3.25], [3.5 ,8.25]]
+# task = [[3.5 ,3.25], [4.5 ,-0.5]]
 task = np.array(task)
 from move_model import leader_coverage
 robots = leader_coverage(robots, task)
