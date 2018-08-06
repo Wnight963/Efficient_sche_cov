@@ -21,11 +21,5 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
-
-G = nx.Graph()
-G.add_path([0,1,2,3])
-H = G.subgraph([0,1,2])
-print(H.degree)
-nx.draw(H)
-plt.show()
-
+a = (1==1) and (2==3)
+print(a)

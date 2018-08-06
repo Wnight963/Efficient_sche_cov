@@ -91,7 +91,7 @@ def active_team_move(robot_list, moving_robot_index, target):
             #     print('BERAK2')
                 break
             location = new_location.copy()
-        routing_graph(location, transmission(location, routing_strategy), N, K)
+        # routing_graph(location, transmission(location, routing_strategy), N, K)
     # print("ACTIVE MOVING TERMINATED!")
     return robot_list
 
@@ -285,11 +285,11 @@ def scheduling_for_single_task(robot_list, target):
 
 def leader_coverage(robot_list, target):
 
-
+    import matplotlib.pyplot as plt
 
     robots = robot_list
     robots, leader_index = leader_election(robots, target[0])
-    worker = [leader_index]
+    worker = [leader_index, N+K-1]
     for point in target:
         robots = leader_move(robots, leader_index, point)
 
@@ -297,33 +297,39 @@ def leader_coverage(robot_list, target):
             robots, recruit_index = recruit_election(robots)
             print('recruit:')
             print(recruit_index)
-            worker.append(recruit_index)
-
             G = robot_network_extraction(robots)
             H = G.subgraph(worker)
+            H = nx.relabel_nodes(H, {N+K-1: recruit_index})
 
-            print('H nodes:')
-            for x in H.nodes:
-                print(x)
-            for x in H.degree:
-                if x[1]>=3 and x[0]<N:
-                    robots[x[0]].role_update('junction')
-                else:
-                    robots[x[0]].role_update('node')
+            nx.draw(H, with_labels=True)
+            plt.show()
+
+            # replace AP by the recruit
+            for nod in H.out_degree:
+                index = nod[0]
+                out_deg = nod[1]
+                if robots[index].role=='node' and out_deg>2:
+                    robots[index].role_update('junction')
+            # identify all junction node
             for x in robots:
                 if x.role=='junction':
-                    print('%d is a junction' % x.number)
-            # secondary_leader_team_index = secondary_leader_team_construction(
-            #     robots, recruit_index, leader_index)
+                    print("%d is a junction node!!!! out degree is %d" % (x.number, 2))
+                    print('successors are:')
+                    print([y for y in H.successors(x.number)])
+            shortest_path = nx.shortest_path(H, source=recruit_index, target=leader_index)
+            # shortest path from AP to leader
 
-            shortest_path = nx.shortest_path(G, source=N + K - 1, target=leader_index)
-            shortest_path[0] = recruit_index
+
             moving_robot_index = shortest_path
             print('moving robot index:')
             print(moving_robot_index)
-            old_location = location_extraction(robots)
             robots = active_team_move(robots, moving_robot_index, point)
-            worker = [x for x in worker if LA.norm(robots[x].location) > 0.4]
+            # worker = [x for x in worker if LA.norm(robots[x].location) > 0.4]
+            for nod in H.out_degree:
+                index = nod[0]
+                if robots[index].role!='leader':
+                    robots[index].role_update('node')
+            worker.insert(0, recruit_index)
             # if max(LA.norm((location_extraction(robots) - old_location), axis=1))<0.05:
 
 

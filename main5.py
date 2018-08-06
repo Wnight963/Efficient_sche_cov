@@ -14,7 +14,7 @@ f.close()
 
 for x in robots:
     x.pre_role = "redundant_node"
-    x.location /= 2
+    x.location /= 3
     print(x.number, x.role, x.pre_role, x.location)
 robots[-1].pre_role = 'AP'
 # robots
@@ -34,7 +34,7 @@ robots[-1].pre_role = 'AP'
 #         task.extend(center)
 
 task = []
-for i in range(5):
+for i in range(3):
     center = []
     for j in range(10):
         center.append([3.5+1*i, 3.25+0.5*j])

@@ -151,7 +151,7 @@ def leader_move(robot_list,leader_index, target):
     from routing_present import routing_graph
     from commu_model import transmission
     T = routing_strategy_extraction(robot_list)
-    routing_graph(location, transmission(location, T), N, K)
+    # routing_graph(location, transmission(location, T), N, K)
 
     # print("leader moves successfully!")
     # print(robot_list[leader_index].location)
