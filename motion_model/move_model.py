@@ -12,7 +12,9 @@ from robot_class import secondary_leader_team_construction
 from robot_class import subgroup_index_extraction
 from commu_model import optimal_routing
 from commu_model import transmission
-from routing_present import routing_graph
+from routing_present import routing_graph_1
+from routing_present import routing_graph_2
+
 
 import numpy as np
 import networkx as nx
@@ -92,7 +94,8 @@ def active_team_move(robot_list, moving_robot_index, target):
             #     print('BERAK2')
                 break
             location = new_location.copy()
-        routing_graph(location, transmission(location, routing_strategy), N, K)
+        routing_graph_1(location, transmission(location, routing_strategy), N, K)
+        routing_graph_2(location, transmission(location, routing_strategy), N, K)
     # print("ACTIVE MOVING TERMINATED!")
     return robot_list
 

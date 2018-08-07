@@ -54,7 +54,12 @@ robots = leader_coverage(robots, task)
 print('*******************************************************')
 
 
-name = 'robots_after_coverage_.pckl'
+
+name = 'robots_after_coverage_path_planning.pckl'
 f = open(name, 'wb')
 pickle.dump(robots, f)
 f.close()
+
+
+
+target = np.array([3.5, 7.2])

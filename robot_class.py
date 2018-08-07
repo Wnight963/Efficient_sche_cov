@@ -148,10 +148,12 @@ def leader_move(robot_list,leader_index, target):
             else:
                 b = new_location
 
-    from routing_present import routing_graph
+    from routing_present import routing_graph_1
+    from routing_present import routing_graph_2
     from commu_model import transmission
     T = routing_strategy_extraction(robot_list)
-    routing_graph(location, transmission(location, T), N, K)
+    routing_graph_1(location, transmission(location, T), N, K)
+    routing_graph_2(location, transmission(location, T), N, K)
 
     # print("leader moves successfully!")
     # print(robot_list[leader_index].location)
