@@ -12,7 +12,10 @@ K = 1
 
 
 class ROBOT:
-    'data structure of robot'
+
+    """
+    data structure of robot
+    """
 
     role_set = set(['node', 'redundant_node', 'junction', 'leaf', 'leader', 'AP'])
     def __init__(self, number, location, routing_strategy=np.zeros([1, N+K]),
@@ -46,7 +49,11 @@ class ROBOT:
 
 def location_extraction(robot_list):
 
-    'input: a list of robots, output: location of robots, np.ndarray, shape (robot number, 2)'
+    """
+
+    :param robot_list: a list of robots
+    :return: location of robots, np.ndarray, shape (robot number, 2)
+    """
 
     M = len(robot_list)
     location = robot_list[0].location
@@ -57,7 +64,11 @@ def location_extraction(robot_list):
 
 def channel_matrix_extraction(robot_list):
 
-    'output: channel matrix between robots, a np.array, shape: N*(N+K)'
+    """
+
+    :param robot_list:
+    :return: channel matrix between robots, a np.array, shape: N*(N+K)
+    """
 
     from channel_capa import Capacity
     x = location_extraction(robot_list)
@@ -69,8 +80,12 @@ def channel_matrix_extraction(robot_list):
 
 def routing_strategy_extraction(robot_list):
 
-    'output: routing strategy of robots from 0 to N-1, the last K are APs and are overlooked'
-    'output is a np.array, shape: N*(N+K)'
+    """
+
+    :param robot_list:
+    :return: routing strategy of robots from 0 to N-1, the last K are APs and are overlooked
+    output is a np.array, shape: N*(N+K)
+    """
 
     M = len(robot_list)
     routing_strategy = robot_list[0].routing_strategy
@@ -81,7 +96,11 @@ def routing_strategy_extraction(robot_list):
 
 def leader_index_extraction(robot_list):
 
-    'return number of robot whose role is "leader"'
+    """
+
+    :param robot_list:
+    :return: number of robot whose role is "leader
+    """
 
     for x in robot_list:
         if(x.role=='leader'):
@@ -89,8 +108,11 @@ def leader_index_extraction(robot_list):
 
 
 def redundant_node_index_extraction(robot_list):
+    """
 
-    'return list of redundant node index'
+    :param robot_list:
+    :return: list of redundant node index
+    """
 
     res = []
     for x in robot_list:
@@ -101,7 +123,13 @@ def redundant_node_index_extraction(robot_list):
 
 def leader_election(robot_list, target): # waiting to be modefied into distributed fashion
 
-    'input: a list of robot; output: leader of these robots via consensus'
+    """
+
+    :param robot_list: a list of robot
+    :param target:
+    :return: leader of these robots
+    """
+
     print("target:")
     print(target)
     distance = [LA.norm(x.location-target) for x in robot_list if x.role=='redundant_node' or 99999]
@@ -112,7 +140,11 @@ def leader_election(robot_list, target): # waiting to be modefied into distribut
 
 def recruit_election(robot_list):
 
-    'input: a list of robot; output: recruit of these robots via consensus'
+    """
+
+    :param robot_list:
+    :return: recruit of these robots
+    """
 
     import random
     redundant_node_index = redundant_node_index_extraction(robot_list)
@@ -127,8 +159,15 @@ def recruit_election(robot_list):
 
 def leader_move(robot_list,leader_index, target):
 
-    'leader moves towards the target, until communication constraints are breake'
-    'to determine the farest position leader can reach, we use a binary search'
+    """
+    leader moves towards the target, until communication constraints are breake
+    to determine the farest position leader can reach, we use a binary search
+    :param robot_list:
+    :param leader_index:
+    :param target:
+    :return:
+    """
+
 
     from commu_model import optimal_routing
     location = location_extraction(robot_list)
@@ -162,9 +201,18 @@ def leader_move(robot_list,leader_index, target):
 
 def single_node_move(location_of_robot, single_moving_node_index, destination, routing_strategy, sigma):
 
-    'robot moves towards the destination, with given communication constraints obeyed'
-    'to determine the farest position leader can reach, we use a binary search'
-    'return new location of that moving node'
+    """
+    robot moves towards the destination, with given communication constraints obeyed
+    to determine the farest position leader can reach, we use a binary search
+    return new location of that moving node'
+    :param location_of_robot:
+    :param single_moving_node_index:
+    :param destination:
+    :param routing_strategy:
+    :param sigma:
+    :return:
+    """
+
 
     location = location_of_robot.copy()
     # this is important! to copy a list in python, The operator [:] returns a slice of a sequence.
@@ -204,8 +252,11 @@ def single_node_move(location_of_robot, single_moving_node_index, destination, r
 
 def robot_network_extraction(robots):
 
-    'construct a robot communication network, nodes are robots, and edges exist if T*R>0'
-    'return a nx.DiGraph'
+    """
+    construct a robot communication network, nodes are robots, and edges exist if T*R>0
+    :param robots:
+    :return: return a nx.DiGraph
+    """
 
     import networkx as nx
     G = nx.DiGraph()
@@ -262,8 +313,13 @@ def subgroup_index_extraction(original_list, word):
 
 def secondary_leader_team_construction(robots, recruit_index, recruit_inducer_index):
 
-    'construct the secondary leader team, source node: the recruit,'
-    'target node: robot who induces recruit'
+    """
+    construct the secondary leader team, source node: the recruit
+    :param robots:
+    :param recruit_index:
+    :param recruit_inducer_index: robot who induces recruit
+    :return:
+    """
 
     G = robot_network_extraction(robots)
 

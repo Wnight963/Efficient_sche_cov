@@ -106,6 +106,7 @@ def scheduling_for_single_task(robot_list, target):
 
     robots = robot_list
     robots, leader_index = leader_election(robots, target)
+    print('leader is %d' % leader_index)
 
     if (robots[leader_index].pre_role == 'leaf'):
         robots, recruit_index = recruit_election(robots)
@@ -121,15 +122,21 @@ def scheduling_for_single_task(robot_list, target):
         # secondary_leader_team_index.append([leader_index])
         for i in range(len(secondary_leader_team_index)):
             if i<len(secondary_leader_team_index)-1:
-                current_location = robots[secondary_leader_team_index[i + 1][0]].location
-                distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                destination = task[distance_to_current_location.index(min
-                                                                      (distance_to_current_location))]
+
+                # current_location = robots[secondary_leader_team_index[i + 1][0]].location
+                # distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                # destination = task[distance_to_current_location.index(min
+                #                                                       (distance_to_current_location))]
+
+                destination = robots[secondary_leader_team_index[i + 1][0]].location
             else:
-                current_location = robots[leader_index].location
-                distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                destination = task[distance_to_current_location.index(min
-                                                                      (distance_to_current_location))]
+
+                # current_location = robots[leader_index].location
+                # distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                # destination = task[distance_to_current_location.index(min
+                #                                                       (distance_to_current_location))]
+
+                destination = robots[leader_index].location
             robots = active_team_move(robots, secondary_leader_team_index[i], destination)
             #######
             ####### if the subgroup's destination is a leaf node, we just change the destination
@@ -162,12 +169,14 @@ def scheduling_for_single_task(robot_list, target):
             for x in secondary_leader_team_index:
                 print([robots[h].role for h in x])
             for i in range(len(secondary_leader_team_index) - 1):
-                # -1 because the last one will join primary leader team then moves
-                current_location = robots[secondary_leader_team_index[i + 1][0]].location
-                distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                destination = task[distance_to_current_location.index(min
-                                                                          (distance_to_current_location))]
+                ####### -1 because the last one will join primary leader team then moves
+                # current_location = robots[secondary_leader_team_index[i + 1][0]].location
+                # distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                # destination = task[distance_to_current_location.index(min
+                #                                                           (distance_to_current_location))]
+                destination = robots[secondary_leader_team_index[i + 1][0]].location
                 robots = active_team_move(robots, secondary_leader_team_index[i], destination)
+
                 # if (i < len(secondary_leader_team_index) - 2):
                 #     tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
                 # else:
@@ -198,22 +207,33 @@ def scheduling_for_single_task(robot_list, target):
         print(secondary_leader_team_index)
         for x in secondary_leader_team_index:
             print([robots[h].role for h in x])
-        ########### once the leader is elected and it's previous role is a leaf node
+        ########### once the leader is elected and it's previous role is a junction or node
         ########### a recruit election is immediately induced to release the leader from
         ########### its previous location
         # secondary_leader_team_index.append([leader_index])
         for i in range(len(secondary_leader_team_index)):
             if i < len(secondary_leader_team_index) - 1:
-                current_location = robots[secondary_leader_team_index[i + 1][0]].location
-                distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                destination = task[distance_to_current_location.index(min
-                                                                      (distance_to_current_location))]
+
+
+                # current_location = robots[secondary_leader_team_index[i + 1][0]].location
+                # distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                # destination = task[distance_to_current_location.index(min
+                #                                                       (distance_to_current_location))]
+
+
+                destination = robots[secondary_leader_team_index[i + 1][0]].location
             else:
-                current_location = robots[leader_index].location
-                distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                destination = task[distance_to_current_location.index(min
-                                                                      (distance_to_current_location))]
+
+
+                # current_location = robots[leader_index].location
+                # distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                # destination = task[distance_to_current_location.index(min
+                #                                                       (distance_to_current_location))]
+
+
+                destination = robots[leader_index].location
             robots = active_team_move(robots, secondary_leader_team_index[i], destination)
+
             #######
             ####### if the subgroup's destination is a leaf node, we just change the destination
             ####### to the nearest task
@@ -246,10 +266,11 @@ def scheduling_for_single_task(robot_list, target):
                 print([robots[h].role for h in x])
             for i in range(len(secondary_leader_team_index) - 1):
                 # -1 because the last one will join primary leader team then moves
-                current_location = robots[secondary_leader_team_index[i + 1][0]].location
-                distance_to_current_location = [LA.norm(x - current_location) for x in task]
-                destination = task[distance_to_current_location.index(min
-                                                                      (distance_to_current_location))]
+                # current_location = robots[secondary_leader_team_index[i + 1][0]].location
+                # distance_to_current_location = [LA.norm(x - current_location) for x in task]
+                # destination = task[distance_to_current_location.index(min
+                #                                                       (distance_to_current_location))]
+                destination = robots[secondary_leader_team_index[i + 1][0]].location
                 robots = active_team_move(robots, secondary_leader_team_index[i], destination)
                 # if (i < len(secondary_leader_team_index) - 2):
                 #     tmp_role = robots[secondary_leader_team_index[i + 1][0]].role
@@ -287,7 +308,17 @@ def scheduling_for_single_task(robot_list, target):
     return robots
 
 
+
+
+
 def leader_coverage(robot_list, target):
+
+    """
+
+    :param robot_list:
+    :param target: a sequence of locations to visit so that a zone can be covered
+    :return: robot_list when coverage is done
+    """
 
     import matplotlib.pyplot as plt
 

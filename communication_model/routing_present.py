@@ -17,6 +17,8 @@ global deteced_user
 deteced_user = []
 # global variable, all the detected users
 
+positions = [[4.2, 4], [4.5, 6], [3.7, 7], [7, 5.5], [7.2, 7]]
+positions = np.array(positions)
 
 def if_is_detected(x, user):
 
@@ -32,8 +34,15 @@ def if_is_detected(x, user):
 
 
 def routing_graph_1(x, transmission, N, K):
+    """
 
-    'input: x:locations of robots'
+    :param x: location of robots
+    :param transmission: amount of transmission data
+    :param N: number of robot
+    :param K: number of AP
+    :return: no return, but plot a graph
+    """
+
 
     ax1.cla()
     # ax1.grid(True, linestyle="-.", color="r", linewidth="3")
@@ -45,6 +54,7 @@ def routing_graph_1(x, transmission, N, K):
     # ax1.set_yticks(minor_ticks)
     # ax1.grid(which='both')
     ax1.scatter(x[:, 0], x[:, 1])
+    ax1.scatter(positions[:, 0], positions[:, 1], marker='x')
 
     global deteced_user
     residual_user = [x for x in user if x not in np.array(deteced_user)]
@@ -52,8 +62,8 @@ def routing_graph_1(x, transmission, N, K):
         if if_is_detected(x, n):
             deteced_user.append(n)
 
-    if len(deteced_user):
-        ax1.scatter(np.array(deteced_user)[:,0], np.array(deteced_user)[:,1], linewidths=1)
+    # if len(deteced_user):
+    #     ax1.scatter(np.array(deteced_user)[:,0], np.array(deteced_user)[:,1], linewidths=1)
 
 
     for i in range(len(x)):
@@ -61,7 +71,7 @@ def routing_graph_1(x, transmission, N, K):
         # ax1.add_patch(cir)
         xy = (x[i, 0] - 0.5, x[i, 1] - 0.25)
         rec = Rectangle(xy, height=0.5, width=1, fill=False)
-        ax1.add_patch(rec)
+        # ax1.add_patch(rec)
         # draw a circle around UAVs
     # task = [[3,3], [4,4]]
     # task = np.array(task)
@@ -78,7 +88,7 @@ def routing_graph_1(x, transmission, N, K):
             task.extend(center)
     task = np.array(task)
 
-    ax1.scatter(task[:, 0], task[:, 1], marker='x')
+    # ax1.scatter(task[:, 0], task[:, 1], marker='x')
     n = range(N + K)
     for i, txt in enumerate(n):
         ax1.annotate(txt, (x[i, 0], x[i, 1]))  # number the points
@@ -88,7 +98,8 @@ def routing_graph_1(x, transmission, N, K):
             if transmission[i, j] > 0:
                 a = x[[i, j], 0]
                 b = x[[i, j], 1]
-                ax1.plot(a, b, linewidth=50 * transmission[i, j])
+                # ax1.plot(a, b, linewidth=50 * transmission[i, j])
+                ax1.plot(a, b)
                 # thickness denotes transmmision rate
 
     plt.ion()
@@ -116,6 +127,8 @@ def routing_graph_2(x, transmission, N, K):
     ax2.set_yticks(minor_ticks)
     ax2.grid(which='both')
     ax2.scatter(x[:, 0], x[:, 1])
+    ax2.scatter(positions[:, 0], positions[:, 1], marker='x')
+
 
     global deteced_user
     residual_user = [x for x in user if x not in np.array(deteced_user)]
@@ -123,8 +136,8 @@ def routing_graph_2(x, transmission, N, K):
         if if_is_detected(x, n):
             deteced_user.append(n)
 
-    if len(deteced_user):
-        ax2.scatter(np.array(deteced_user)[:,0], np.array(deteced_user)[:,1], linewidths=1)
+    # if len(deteced_user):
+    #     ax2.scatter(np.array(deteced_user)[:,0], np.array(deteced_user)[:,1], linewidths=1)
 
 
     for i in range(len(x)):
@@ -132,7 +145,7 @@ def routing_graph_2(x, transmission, N, K):
         # ax2.add_patch(cir)
         xy = (x[i, 0] - 0.5, x[i, 1] - 0.25)
         rec = Rectangle(xy, height=0.5, width=1, fill=False)
-        ax2.add_patch(rec)
+        # ax2.add_patch(rec)
         # draw a circle around UAVs
     # task = [[3,3], [4,4]]
     # task = np.array(task)
@@ -149,7 +162,7 @@ def routing_graph_2(x, transmission, N, K):
             task.extend(center)
     task = np.array(task)
 
-    ax2.scatter(task[:, 0], task[:, 1], marker='x')
+    # ax2.scatter(task[:, 0], task[:, 1], marker='x')
     n = range(N + K)
     for i, txt in enumerate(n):
         ax2.annotate(txt, (x[i, 0], x[i, 1]))  # number the points
@@ -159,7 +172,8 @@ def routing_graph_2(x, transmission, N, K):
             if transmission[i, j] > 0:
                 a = x[[i, j], 0]
                 b = x[[i, j], 1]
-                ax2.plot(a, b, linewidth=50 * transmission[i, j])
+                # ax2.plot(a, b, linewidth=50 * transmission[i, j])
+                ax2.plot(a, b)
                 # thickness denotes transmmision rate
 
     plt.ion()
